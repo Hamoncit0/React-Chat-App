@@ -1,9 +1,17 @@
 import React from 'react'
+import { useState } from 'react'
 import './login.css'
 import bigLogo from '../../assets/logo_big.png'
+import Signup from '../signup/signup';
 function login() {
+  const [modal, setModal] = useState(false);
+  const toggleModal = ()=>{
+    setModal(!modal)
+  }
   return (
-    <div className='login'>
+    <div className="container">
+      
+    <div className={`login ${modal ? 'blur-background' : ''}`}>
       <div className="login_left">
         <img src={bigLogo} alt="michi chat logo" className='michiChatLogo'/>
         <div className="gradient"></div>
@@ -19,10 +27,18 @@ function login() {
         </div>
         <button className='login_button'>Iniciar Sesión</button>
         <div>
-            <p className='text'>¿Todavía no tienes una cuenta? <a href="">Regístrate</a></p>
+            <p className='text'>¿Todavía no tienes una cuenta? <a onClick={toggleModal}>Regístrate</a></p>
         </div>
       </form>
       </div>
+    </div>
+      {modal && (
+        <div className="modal">
+              <div className="overlay">
+                <Signup closeModal={toggleModal}></Signup>
+              </div>
+        </div>
+      )}
     </div>
   )
 }

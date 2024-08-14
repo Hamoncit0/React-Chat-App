@@ -1,5 +1,5 @@
 .signup{
-    width: 50%;
+    width: 40%;
     padding: 20px;
     margin: auto;
     margin-top: 5%;
@@ -11,21 +11,40 @@
     border-radius: 50px;
     border: dashed 10px #9BB3E8;
 }
+.close{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+.close_button{
+    padding: 5px;
+    margin: 10px;
+    font-weight: bold;
+    border: 0;
+    border-radius: 50px;
+    background-color: #9BB3E8;
+    align-self: center;
+
+}
+.close_button:hover{
+    cursor: pointer;
+
+}
 .title{
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 50px;
+    margin: 10px;
 }
 .title h1{
     margin: 0;
-    font-size: 4vw;
+    margin-left: 25px;
+    font-size: 3.7vw;
 }
 .title img{
     margin: 0;
-    margin-top: -32%;
-    margin-bottom: -20%;
-    width:37vw;
+    margin-top: -15%;
+    width:34vw;
 }
 .signup_form{
     display: flex;
@@ -34,10 +53,11 @@
     margin-bottom: 3%;
 }
 .formfield input{
+    width: 100%;
     padding: 10px;
     margin: 10px;
     font-size: 2vw;
-    border: 0.3vw solid  #1A133D;
+    border: 0.3vw solid  #181143;
     border-radius: 5px;
     box-sizing: border-box;
     background-color: #F7F7F7;
@@ -52,6 +72,7 @@
 .signup_button{
     padding: 4%;
     margin: 10px;
+    width: 55%;
     padding-left: 10%;
     padding-right: 10%;
     font-size: 1.7vw;
@@ -60,4 +81,7 @@
     border-radius: 50px;
     background-color: #9BB3E8;
     align-self: center;
+}
+.signup_button:hover{
+    cursor: pointer;
 }

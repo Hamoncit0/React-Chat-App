@@ -1,10 +1,13 @@
 import React from 'react'
 import './signup.css'
 import yarnImg from '../../assets/yarn.png'
-
-function signup() {
+import CloseIcon from '@mui/icons-material/Close';
+function signup({isOpen, closeModal, children}) {
   return (
     <div className='signup'>
+      <div className='close'>
+        <button className='close_button' onClick={closeModal}><CloseIcon fontSize='medium'></CloseIcon></button>
+      </div>
         <div className="title">
             <h1>Regístrate</h1>
             <img src={yarnImg} alt="" />
@@ -25,9 +28,8 @@ function signup() {
             <div className='formfield'>
             <input type="text" placeholder='Contraseña' />
             </div>
-            <button className='signup_button'>Iniciar Sesión</button>
+            <button className='signup_button'>¡Listo!</button>
         </form>
-        
     </div>
   )
 }
