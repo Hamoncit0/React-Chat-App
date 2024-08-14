@@ -4,3 +4,16 @@
 body{
   font-family: Arial, Helvetica, sans-serif;
 }
+:root {
+  --color-primary: #007bff;
+  --color-secondary: #6c757d;
+  --background-color: #f8f9fa;
+  --text-color: #212529;
+}
+
+.dark-theme {
+  --color-primary: #343a40;
+  --color-secondary: #495057;
+  --background-color: #212529;
+  --text-color: #f8f9fa;
+}

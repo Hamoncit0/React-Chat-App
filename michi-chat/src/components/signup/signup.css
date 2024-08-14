@@ -1,0 +1,63 @@
+.signup{
+    width: 50%;
+    padding: 20px;
+    margin: auto;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff7f2;
+    border-radius: 50px;
+    border: dashed 10px #9BB3E8;
+}
+.title{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 50px;
+}
+.title h1{
+    margin: 0;
+    font-size: 4vw;
+}
+.title img{
+    margin: 0;
+    margin-top: -32%;
+    margin-bottom: -20%;
+    width:37vw;
+}
+.signup_form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 3%;
+}
+.formfield input{
+    padding: 10px;
+    margin: 10px;
+    font-size: 2vw;
+    border: 0.3vw solid  #1A133D;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #F7F7F7;
+}
+.formfield input::placeholder{
+    text-align: center;
+    font-size: 2vw;
+    color: #7B7B7B;
+    font-style: italic;
+    opacity: 1;
+}
+.signup_button{
+    padding: 4%;
+    margin: 10px;
+    padding-left: 10%;
+    padding-right: 10%;
+    font-size: 1.7vw;
+    font-weight: bold;
+    border: 0.3vw solid #1A133D;
+    border-radius: 50px;
+    background-color: #9BB3E8;
+    align-self: center;
+}
