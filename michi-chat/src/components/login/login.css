@@ -65,11 +65,13 @@
     font-size: 1.7vw;
     font-weight: bold;
     border: 0.3vw solid #1A133D;
-    border-radius: 30px;
+    border-radius: 50px;
     background-color: #9AB4E7;
     align-self: center;
 }
 .text{
+    margin-left: -10px;
+    margin-top: 20px;
     font-size: 1.2vw;
     font-weight: 600;
     font-style: italic;
