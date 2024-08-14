@@ -1,0 +1,90 @@
+.login{
+    display: flex;
+    height: 100vh;
+    margin: 0;
+}
+.login_right{
+    margin: 0;
+    flex: 1.25;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #F7F7F7;
+}
+.login_left{
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: #FFF8F2;
+    overflow: hidden;
+}
+.login_left img{
+    max-width: 90%; /* Image will not exceed the width of the left side */
+    max-height: 50%; /* Image will not exceed the height of the left side */
+    width: auto; /* Maintain the image's aspect ratio */
+    height: auto; /* Maintain the image's aspect ratio */
+    object-fit: contain;
+    z-index: 2;
+    margin-right: 10%;
+}
+.login_form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.formfield input{
+    padding: 10px;
+    margin: 10px;
+    font-size: 2vw;
+    border: 0.3vw solid  #1A133D;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #F7F7F7;
+}
+.formfield input::placeholder{
+    text-align: center;
+    font-size: 2vw;
+    color: #7B7B7B;
+    font-style: italic;
+    opacity: 1;
+}
+.title{
+    font-size: 3vw;
+    font-weight: 600;
+    font: #2D212C;
+}
+.login_button{
+    padding: 4%;
+    margin: 10px;
+    padding-left: 10%;
+    padding-right: 10%;
+    font-size: 1.7vw;
+    font-weight: bold;
+    border: 0.3vw solid #1A133D;
+    border-radius: 30px;
+    background-color: #9AB4E7;
+    align-self: center;
+}
+.text{
+    font-size: 1.2vw;
+    font-weight: 600;
+    font-style: italic;
+}
+.text a{
+    text-decoration: none;
+    color: inherit;
+    font-weight: 800;
+}
+.gradient {
+    margin-right: 0;
+    margin-left: 10px;
+    height: 100%;
+    width: 16%; /* Adjust the width of the gradient */
+    background: linear-gradient(to left, rgb(131, 131, 131), transparent); /* Gradient from black to transparent */
+    z-index: 1; /* Gradient behind the image */
+    flex-shrink: 0;
+}
