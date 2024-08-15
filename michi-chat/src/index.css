@@ -5,15 +5,16 @@ body{
   font-family:'Poppins';
 }
 :root {
-  --color-primary: #007bff;
-  --color-secondary: #6c757d;
-  --background-color: #f8f9fa;
-  --text-color: #212529;
+  --color-primary: #9bb3e8;
+  --color-secondary: #737373;
+  --background-color: #F7F7F7;
+  --background-secondary: #FFF7F2;
+  --text-color: #000000;
 }
 
 .dark-theme {
-  --color-primary: #343a40;
-  --color-secondary: #495057;
-  --background-color: #212529;
+  --color-primary: #26203a;
+  --color-secondary: #737373;
+  --background-color: #2b202c;
   --text-color: #f8f9fa;
 }

@@ -1,0 +1,26 @@
+
+.main{
+    display: flex;
+    height: 87vh;
+    margin: 0;
+}
+.chat_list{
+    background-color: var(--background-color);
+    margin: 0;
+    flex: 0.4;
+    display: flex;
+    flex-direction: column;
+    border-right: dashed 4px var(--color-primary);
+}
+.chat_container{
+    display: 'flex'; align-items: 'center'; padding: '10px'; border-bottom: '2px dashed #ccc';
+}
+.chat{
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-secondary);
+}

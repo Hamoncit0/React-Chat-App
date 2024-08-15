@@ -1,0 +1,44 @@
+.header{
+    margin: 0;
+    height: 13vh;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-primary);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0px 8px 15px rgb(148, 148, 148);
+}
+.header_logo{
+    width: 31vh;
+    object-fit: contain;
+    margin: 0 20px;
+    margin-top: 1vwx;
+}
+.profile_picture{
+    align-self: end;
+    height: 8vh;
+    width: 8vh;
+    border-radius: 50%;
+    margin: 10px;
+    margin-right: 5%;
+    position: relative;
+}
+.profile_picture img{
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+}
+
+.status_circle {
+  width: 2vh;
+  height: 2vh;
+  border-radius: 50%;
+  background-color: rgb(72, 255, 72);
+  border: 2px solid white;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+}
