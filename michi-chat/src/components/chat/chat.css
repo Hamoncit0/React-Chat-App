@@ -7,8 +7,7 @@
 }
 .chat_name{
     background-color: var(--color-active-secondary);
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 10px
 }
 .chat_content{ 
     background-color: var(--background-secondary);

@@ -7,6 +7,7 @@ import guionkuna from '../../assets/pictures/images.jpg'
 import capy from '../../assets/pictures/capybara.jpg'
 import { Box, Typography, Avatar } from '@mui/material';
 import Header from '../header/header'
+import Tiendita from '../tiendita/tiendita'
 
 function mainPage() {
   return (
@@ -14,7 +15,7 @@ function mainPage() {
       <div>
         <Header></Header>
       </div>
-      <div className="main">
+      {/* <div className="main">
         
       <div className="chat_list">
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed #9bb3e8', height: '10vh' }}>
@@ -40,7 +41,8 @@ function mainPage() {
         <div className="chat_space">
           <Chat></Chat>
         </div>
-      </div>
+      </div> */}
+    <Tiendita></Tiendita>
     </div>
   )
 }

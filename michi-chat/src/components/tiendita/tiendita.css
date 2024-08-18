@@ -1,0 +1,71 @@
+.tiendita{
+    display: flex;
+}
+.tiendita_nav{
+    height: 100vh;
+    background-color: var(--background-secondary);
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    border-right: 4px var(--color-primary) dashed;
+}
+.tiendita_nav a{
+    padding: 20px;
+    text-decoration: none;
+    border-bottom:  4px var(--color-primary) dashed;
+}
+.tiendita_nav a:hover{
+    background-color: var(--color-active-secondary);
+}
+.tiendita_main{
+    padding: 30px;
+    background-color: var(--background-color);
+    overflow-y: auto; /* Permite el desplazamiento vertical */
+    flex-grow: 1; /* Asegura que la sección de productos ocupe el espacio disponible */
+    max-height: calc(100vh - 60px); /* Ajusta la altura para evitar que el contenedor sobrepase la pantalla */
+}
+.productos{
+    display: flex;
+    margin: 20px;
+    flex-wrap: wrap;
+}
+.producto{
+    display: flex;
+    flex-direction: column;
+    margin: 50px;
+}
+.muestra{
+    align-self: end;
+    position: relative;
+}
+.muestra_pic{
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+}
+.sombrerito{
+    height: 100px;
+    width: 100px;
+    top: -60px;
+    left: -20px;
+    position: absolute;
+}
+.precio button{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--color-primary);
+    border: 3px solid var(--color-accent);
+    border-radius: 30px;
+}
+.precio button:hover{
+    background-color: var(--color-active);
+    color: white;
+}
+.precio img{
+    height: 40px;
+    width: 40px;
+    margin-left: 10px;
+}
