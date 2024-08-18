@@ -1,5 +1,6 @@
 import React from 'react'
 import './main-page.css'
+import Chat from '../chat/chat'
 
 import elgato from '../../assets/pictures/elgato.png'
 import guionkuna from '../../assets/pictures/images.jpg'
@@ -33,8 +34,9 @@ function mainPage() {
           </Typography>
           </Box>
         </div>
-        <div className="chat">
-            owo
+
+        <div className="chat_space">
+            <Chat></Chat>
         </div>
       </div>
     </div>

@@ -9,15 +9,17 @@ body{
   --color-secondary: #737373;
   --color-accent: #181143;
   --color-active: #8488d5;
+  --color-active-secondary: #D9D9D9;
   --background-color: #F7F7F7;
   --background-secondary: #FFF7F2;
   --text-color: #000000;
 }
 
-.darktheme {
+body.darktheme {
   --color-primary: #9B7960;
   --color-secondary: #737373;
   --color-accent: #2a1f1d;
+  --color-active: #2a1f1d;
   --background-color: #BD977C;
   --background-secondary: #CBB19B;
   --text-color: #f8f9fa;
