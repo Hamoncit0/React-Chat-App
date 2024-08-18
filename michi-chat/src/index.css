@@ -15,6 +15,7 @@ body{
   --background-secondary: #FFF7F2;
   --background-accent: white;
   --text-color: #000000;
+  --box-shadow-color: rgb(148,148,148);
 }
 
 body.darktheme {
@@ -27,4 +28,5 @@ body.darktheme {
   --background-secondary: #CBB19B;
   --background-accent: #3a3434;
   --text-color: #f8f9fa;
+  --box-shadow-color: rgb(37,37,37);
 }

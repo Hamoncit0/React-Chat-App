@@ -28,9 +28,8 @@ function header() {
             <li>Chats</li>
             <li>Tiendita</li>
             <li>
-            <h5>Modo {isDarkMode ? 'Oscuro' : 'Claro'}</h5>
-                <button onClick={toggleTheme}>
-                    Cambiar a {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                <button onClick={toggleTheme} style={{background:'none',border: '0px', height:'100%', width:'100%', font:'inherit'}}>
+                   Cambiar a {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                 </button>
             </li>
           </ul>
