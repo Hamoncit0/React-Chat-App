@@ -3,6 +3,7 @@
 }
 body{
   font-family:'Poppins';
+  color: var(--text-color);
 }
 :root {
   --color-primary: #9bb3e8;
@@ -12,6 +13,7 @@ body{
   --color-active-secondary: #D9D9D9;
   --background-color: #F7F7F7;
   --background-secondary: #FFF7F2;
+  --background-accent: white;
   --text-color: #000000;
 }
 
@@ -19,8 +21,10 @@ body.darktheme {
   --color-primary: #9B7960;
   --color-secondary: #737373;
   --color-accent: #2a1f1d;
+  --color-active-secondary: #674d4d;
   --color-active: #2a1f1d;
   --background-color: #BD977C;
   --background-secondary: #CBB19B;
+  --background-accent: #3a3434;
   --text-color: #f8f9fa;
 }

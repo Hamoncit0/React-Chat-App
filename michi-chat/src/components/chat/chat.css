@@ -31,7 +31,7 @@
     margin: 10px;
 }
 .msg_content{
-    background-color: white;
+    background-color: var(--background-accent);
     border-radius: 20px;
     padding: 15px;
     margin: 10px;
