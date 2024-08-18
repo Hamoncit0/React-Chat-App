@@ -11,10 +11,12 @@ import Header from '../header/header'
 function mainPage() {
   return (
     <div className='mainpage'>
-      <Header></Header>
+      <div>
+        <Header></Header>
+      </div>
       <div className="main">
         
-        <div className="chat_list">
+      <div className="chat_list">
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed #9bb3e8', height: '10vh' }}>
           <Avatar sx={{height: '60px', width: '60px'}} src={elgato} alt="Logo" />
           <Typography variant="h5" sx={{ marginLeft: '20px' }}>
@@ -36,7 +38,7 @@ function mainPage() {
         </div>
 
         <div className="chat_space">
-            <Chat></Chat>
+          <Chat></Chat>
         </div>
       </div>
     </div>

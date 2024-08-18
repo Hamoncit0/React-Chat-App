@@ -1,10 +1,19 @@
-.main{
+.mainpage {
+    height: 100vh; /* Resta los 5px de la altura del header */
     display: flex;
-    width: 100%;
-    height: calc(100vh - (13vh - 5px )) ;
+    flex-direction: column; 
     margin: 0;
+    padding: 0;
+    overflow-y: hidden;
 }
-.chat_list{
+
+.main {
+    background-color: aqua;
+    height: 100%;
+    display: flex;
+}
+
+.chat_list {
     background-color: var(--background-color);
     margin: 0;
     flex: 0.4;
@@ -12,7 +21,9 @@
     flex-direction: column;
     border-right: dashed 4px var(--color-primary);
 }
-.chat_space{
-    width: 100%;
+
+.chat_space {
+    height: 100%;
+    flex: 1; /* Ocupa el resto del espacio disponible */
     background-color: blueviolet;
 }
