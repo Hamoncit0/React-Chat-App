@@ -9,7 +9,7 @@
     align-items: center;
     background-color: #fff7f2;
     border-radius: 50px;
-    border: dashed 10px #9BB3E8;
+    border: dashed 10px var(--color-primary);
 }
 .close{
     width: 100%;
@@ -22,7 +22,7 @@
     font-weight: bold;
     border: 0;
     border-radius: 50px;
-    background-color: #9BB3E8;
+    background-color: var(--color-primary);
     align-self: center;
 
 }
@@ -57,7 +57,7 @@
     padding: 10px;
     margin: 10px;
     font-size: 2vw;
-    border: 0.3vw solid  #181143;
+    border: 0.3vw solid  var(--color-accent);
     border-radius: 5px;
     box-sizing: border-box;
     background-color: #F7F7F7;
@@ -77,9 +77,9 @@
     padding-right: 10%;
     font-size: 1.7vw;
     font-weight: bold;
-    border: 0.3vw solid #1A133D;
+    border: 0.3vw solid var(--color-accent);
     border-radius: 50px;
-    background-color: #9BB3E8;
+    background-color: var(--color-primary);
     align-self: center;
 }
 .signup_button:hover{

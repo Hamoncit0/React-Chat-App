@@ -10,7 +10,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #F7F7F7;
+    background-color: var(--background-color);
 }
 .login_left{
     margin: 0;
@@ -19,7 +19,7 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    background-color: #FFF8F2;
+    background-color: var(--background-secondary);
     overflow: hidden;
 }
 .login_left img{
@@ -40,7 +40,7 @@
     padding: 10px;
     margin: 10px;
     font-size: 2vw;
-    border: 0.3vw solid  #181143;
+    border: 0.3vw solid;
     border-radius: 5px;
     box-sizing: border-box;
     background-color: #F7F7F7;
@@ -55,7 +55,7 @@
 .title{
     font-size: 3vw;
     font-weight: 600;
-    font: #2D212C;
+    color: var(--color-accent);
 }
 .login_button{
     padding: 4%;
@@ -64,9 +64,9 @@
     padding-right: 10%;
     font-size: 1.7vw;
     font-weight: bold;
-    border: 0.3vw solid #181143;
+    border: 0.3vw solid var(--color-accent);
     border-radius: 50px;
-    background-color: #9AB4E7;
+    background-color: var(--color-primary);
     align-self: center;
 }
 .text{

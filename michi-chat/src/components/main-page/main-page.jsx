@@ -17,19 +17,19 @@ function mainPage() {
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed #9bb3e8', height: '10vh' }}>
           <Avatar sx={{height: '60px', width: '60px'}} src={elgato} alt="Logo" />
           <Typography variant="h5" sx={{ marginLeft: '20px' }}>
-            Tania
+            el gato
           </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed #9bb3e8', height: '10vh' }}>
           <Avatar sx={{height: '60px', width: '60px'}} src={guionkuna} alt="Logo" />
           <Typography variant="h5" sx={{ marginLeft: '20px' }}>
-            Elvicio
+            guionkuna
           </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed #9bb3e8', height: '10vh' }}>
           <Avatar sx={{height: '60px', width: '60px'}} src={capy} alt="Logo" />
           <Typography variant="h5" sx={{ marginLeft: '20px' }}>
-            Sofy
+            gort
           </Typography>
           </Box>
         </div>
