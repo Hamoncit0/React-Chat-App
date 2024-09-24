@@ -16,6 +16,10 @@ function tiendita() {
       </div>
       <div className="tiendita_main">
         <h1>Tiendita</h1>
+        <div className="mis-monedas">
+            <h2>Monedas: 5</h2>
+            <img src={monedita} alt="" />
+        </div>
         <div className="productos">
             <div className="producto">
                 <div className="muestra">

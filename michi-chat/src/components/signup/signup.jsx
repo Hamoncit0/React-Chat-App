@@ -14,21 +14,21 @@ function signup({isOpen, closeModal, children}) {
         </div>
         <form action="" className='signup_form'>
             <div className='formfield'>
-            <input type="text" placeholder='Nombre(s)' />
+            <input type="text" placeholder='Nombre(s)' required/>
             </div>
             <div className='formfield'>
-            <input type="text" placeholder='Apellido(s)' />
+            <input type="text" placeholder='Apellido(s)' required/>
             </div>
             <div className='formfield'>
-            <input type="text" placeholder='Usuario' />
+            <input type="text" placeholder='Usuario' required/>
             </div>
             <div className='formfield'>
-            <input type="text" placeholder='Correo electrónico' />
+            <input type="email" placeholder='Correo electrónico' required/>
             </div>
             <div className='formfield'>
-            <input type="text" placeholder='Contraseña' />
+            <input type="password" placeholder='Contraseña' required/>
             </div>
-            <button className='signup_button'>¡Listo!</button>
+            <button type='submit' className='signup_button'>¡Listo!</button>
         </form>
     </div>
   )

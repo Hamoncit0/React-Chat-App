@@ -15,6 +15,7 @@ body{
   --background-secondary: #FFF7F2;
   --background-accent: white;
   --text-color: #000000;
+  --text-color-alt: #f8f9fa;
   --box-shadow-color: rgb(148,148,148);
 }
 
@@ -28,5 +29,30 @@ body.darktheme {
   --background-secondary: #CBB19B;
   --background-accent: #3a3434;
   --text-color: #f8f9fa;
+  --text-color-alt: #000000;
   --box-shadow-color: rgb(37,37,37);
+}
+.btn{
+  color: aliceblue;
+  font-size: larger;
+  display: flex;
+  margin: 2px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-accent);
+  border-radius: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.btn:hover{
+  color: aliceblue;
+  background-color: var(--color-active);
+  cursor: pointer;
+  transition: background-color 100ms linear;
+}
+
+.linkD{
+  text-decoration: none;
+  color: inherit;
 }

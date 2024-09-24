@@ -18,19 +18,19 @@ function mainPage() {
       <div className="main">
         
       <div className="chat_list">
-          <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed var(--color-primary)', height: '10vh' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed var(--color-primary)', height: '10vh', '&:hover': { backgroundColor: 'var(--color-active-secondary)'} }}>
           <Avatar sx={{height: '60px', width: '60px'}} src={elgato} alt="Logo" />
           <Typography variant="h5" sx={{ marginLeft: '20px' }}>
             el gato
           </Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed var(--color-primary)', height: '10vh' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed var(--color-primary)', height: '10vh', '&:hover': { backgroundColor: 'var(--color-active-secondary)'} }}>
           <Avatar sx={{height: '60px', width: '60px'}} src={guionkuna} alt="Logo" />
           <Typography variant="h5" sx={{ marginLeft: '20px' }}>
             guionkuna
           </Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed var(--color-primary)', height: '10vh' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '4px dashed var(--color-primary)', height: '10vh', '&:hover': { backgroundColor: 'var(--color-active-secondary)'} }}>
           <Avatar sx={{height: '60px', width: '60px'}} src={capy} alt="Logo" />
           <Typography variant="h5" sx={{ marginLeft: '20px' }}>
             gort

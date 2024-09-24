@@ -7,6 +7,8 @@
 }
 .chat_name{
     background-color: var(--color-active-secondary);
+    display: flex;
+    justify-content: space-between;
     padding: 10px
 }
 .chat_content{ 
@@ -70,16 +72,18 @@
     display: flex;
 }
 .chat_options button{
-    color: aliceblue;
+    color: var(--text-color-alt);
     font-size: larger;
     margin: 2px;
-    padding-right: 10px;
-    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     background-color: var(--color-primary);
     border: 1px solid var(--color-accent);
-    border-radius: 20px;
+    border-radius: 50%;
+    height: fit-content;
 }
 .chat_options button:hover{
+    cursor: pointer;
     background-color: var(--color-active);
     transition: background-color 100ms linear;
 }

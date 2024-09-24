@@ -59,13 +59,27 @@
     background-color: var(--color-primary);
     border: 3px solid var(--color-accent);
     border-radius: 30px;
+    font-size: large;
+    font-weight: bold;
 }
 .precio button:hover{
     background-color: var(--color-active);
     color: white;
+    transition: background-color 100ms linear;
+    cursor: pointer;
 }
 .precio img{
     height: 40px;
     width: 40px;
     margin-left: 10px;
+}
+.mis-monedas{
+    display: flex;
+    align-items: center;
+}
+.mis-monedas img{
+    height: 40px;
+    width: 40px;
+    margin-left: 10px;
+
 }

@@ -2,11 +2,19 @@ import React from 'react'
 import './chat.css'
 import elgato from '../../assets/pictures/elgato.png'
 import magicbara from '../../assets/pictures/magicbara.png'
+import VideocamIcon from '@mui/icons-material/Videocam';
+import CallIcon from '@mui/icons-material/Call';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import SendIcon from '@mui/icons-material/Send';
 function chat() {
   return (
     <div className='chat'>
       <div className="chat_name">
         <h2>el gato</h2>
+        <div className="chat_options">
+          <button><VideocamIcon></VideocamIcon></button>
+          <button><CallIcon></CallIcon></button>
+        </div>
       </div>
       
       <div className="chat_content">
@@ -65,10 +73,10 @@ function chat() {
       </div>
       <div className="chat_bar">
         <div className="chat_options">
-          <button>Videochat</button>
-          <button>Voicechat</button>
+          <button><AttachFileIcon></AttachFileIcon></button>
         </div>
         <input type="text" placeholder='Escribe Aqui' />
+          <button className="btn">Enviar <SendIcon></SendIcon></button>
       </div>
 
     </div>
