@@ -54,6 +54,9 @@ li:hover, li:active {
     margin-right: 5%;
     position: relative;
 }
+.profile_picture:hover{
+    cursor: pointer;
+}
 .profile_picture img{
     height: 100%;
     width: 100%;
@@ -70,3 +73,27 @@ li:hover, li:active {
   right: 0;
   position: absolute;
 }
+.dropdown-menu .MuiPaper-root{
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-radius: 10px;
+    border: 4px solid var(--color-primary);
+    border-style: dashed;
+}
+.dropdown-menu ul{
+    
+    padding: 0;
+}
+.dropdown-menu .MuiMenuItem-root{
+    border-top: 4px solid var(--color-primary);
+    border-style: dashed;
+}
+.dropdown-menu .MuiMenuItem-root:hover{
+    background-color: var(--color-active-secondary);
+    color: var(--text-color);
+    transition: background-color 100ms linear;
+}
+
+.dropdown-menu .MuiMenuItem-root:first-child {
+    border-top: none;  /* No poner borde en el primer elemento */
+  }
