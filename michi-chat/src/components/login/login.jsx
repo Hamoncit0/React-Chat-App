@@ -3,10 +3,16 @@ import { useState } from 'react'
 import './login.css'
 import bigLogo from '../../assets/logo_big.png'
 import Signup from '../signup/signup';
+import { toast } from 'react-toastify';
+
 function login() {
   const [modal, setModal] = useState(false);
   const toggleModal = ()=>{
     setModal(!modal)
+  }
+  const handleLogin = (e) =>{
+    e.preventDefault();
+    toast.success("Hello")
   }
   return (
     <div className="container">
@@ -18,7 +24,7 @@ function login() {
       </div>
       <div className="login_right">
       <h2 className='title'>¡Bienvenido!</h2>
-      <form action="" className='login_form'>
+      <form onSubmit={handleLogin} className='login_form'>
         <div className='formfield'>
           <input type="text" placeholder='Correo electrónico' />
         </div>
