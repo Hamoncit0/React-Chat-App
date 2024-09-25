@@ -81,6 +81,10 @@
     border-radius: 50px;
     background-color: var(--color-primary);
     align-self: center;
+
+    &:disabled{
+        cursor: not-allowed;
+    }
 }
 .signup_button:hover{
     cursor: pointer;

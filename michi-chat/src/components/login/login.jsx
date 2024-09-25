@@ -4,15 +4,33 @@ import './login.css'
 import bigLogo from '../../assets/logo_big.png'
 import Signup from '../signup/signup';
 import { toast } from 'react-toastify';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../lib/firebase';
 
 function login() {
   const [modal, setModal] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
+
   const toggleModal = ()=>{
     setModal(!modal)
   }
-  const handleLogin = (e) =>{
+  const handleLogin = async (e) =>{
     e.preventDefault();
-    toast.success("Hello")
+     setLoading(true);
+
+     const formData = new FormData(e.target)
+     const{email, password} = Object.fromEntries(formData);
+
+
+    try{
+      await signInWithEmailAndPassword(auth, email, password);
+      toast.success('Se pudo ingresar exitosamente!')
+    }catch(err){
+      console.log(err);
+      toast.error('No se pudo ingresar :(')
+    }finally{
+      setLoading(false);
+    }
   }
   return (
     <div className="container">
@@ -26,10 +44,10 @@ function login() {
       <h2 className='title'>¡Bienvenido!</h2>
       <form onSubmit={handleLogin} className='login_form'>
         <div className='formfield'>
-          <input type="text" placeholder='Correo electrónico' />
+          <input type="text" placeholder='Correo electrónico' name="email" />
         </div>
         <div className='formfield'>
-          <input type="text" placeholder='Contraseña' />
+          <input type="password" placeholder='Contraseña' name="password" />
         </div>
         <button className='login_button'>Iniciar Sesión</button>
         <div>
