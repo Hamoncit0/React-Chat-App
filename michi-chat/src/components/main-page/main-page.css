@@ -27,3 +27,58 @@
     flex: 1; /* Ocupa el resto del espacio disponible */
     background-color: blueviolet;
 }
+
+.search{
+    background-color: var(--background-color);
+    display: flex;
+    color: var(--color-accent);
+    padding: 10px;
+}
+.custom-input {
+    width: 100%;
+}
+.search button{
+    background-color: var(--background-color);
+    color: var(--color-secondary);
+    border: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:hover{
+        cursor: pointer;
+        background-color: var(--color-active-secondary);
+        border-radius: 10px;
+    }
+}
+.custom-input .MuiOutlinedInput-root {
+    border-radius: 20px; /* Rounded corners */
+    background-color: var(--color-active-secondary);
+    border: 1px solid;
+    font-size: larger;
+  }
+  
+  .custom-input .MuiOutlinedInput-root:hover fieldset {
+    border-color: var(--color-secondary); /* Border color when hovered */
+  }
+  
+  .custom-input .MuiOutlinedInput-root.Mui-focused fieldset {
+    border-color: var(--color-secondary); /* Border color when focused */
+  }
+  
+  .custom-input .MuiInputBase-input {
+    padding: 12px 14px; /* Padding for input text */
+  }
+  
+
+/*MODAL*/
+.modal, .overlay{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    z-index: 10;
+    overflow: auto;
+}
+.blur-background{
+    filter: blur(8px);
+}

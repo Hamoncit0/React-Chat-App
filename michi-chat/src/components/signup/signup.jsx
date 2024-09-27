@@ -8,6 +8,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import CircularProgress from '@mui/material/CircularProgress'; 
 import upload from '../../lib/upload';
+
 function signup({isOpen, closeModal, children}) {
 
   const [loading, setLoading] = useState(false); // Loading state

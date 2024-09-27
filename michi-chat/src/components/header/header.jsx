@@ -6,8 +6,10 @@ import { Link } from 'react-router-dom';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Switch from '@mui/material/Switch';
-
+import { useUserStore } from '../../lib/userStore'
+import { auth } from '../../lib/firebase';
 function header() {
+  ////////////////////////MODO OSCURO//////////////////////
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
     const savedTheme = localStorage.getItem('isDarkMode');
@@ -38,6 +40,7 @@ function header() {
     toggleTheme();  // Cambiar el tema cuando se use el Switch
   };
 
+  ////////////////////////////////DROPDOWN MENU//////////////////////////
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -46,6 +49,8 @@ function header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+/////////////////INFO USU/////////////////////////////
+const { currentUser } = useUserStore();
 
 
   return (
@@ -68,7 +73,7 @@ function header() {
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}>
-          <img  src={pictuere} alt="" />
+          <img  src={currentUser.avatar || 'src\assets\pictures\avatar-blank.png'} alt="" />
           <div className="status_circle">
           </div>
         </div>
@@ -91,7 +96,7 @@ function header() {
             checked={isDarkMode} // Vincula el estado del switch con el tema oscuro
             onChange={handleThemeSwitchChange} // Maneja el cambio del switch
           /></MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        <MenuItem onClick={()=>auth.signOut()}>Logout</MenuItem>
       </Menu>
   
 

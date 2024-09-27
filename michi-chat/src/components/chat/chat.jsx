@@ -8,6 +8,7 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import { useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import AddTaskIcon from '@mui/icons-material/AddTask';
 function chat() {
   const scrollRef = useRef(null);
 
@@ -144,6 +145,7 @@ function chat() {
       <div className="chat_bar" >
         <div className="chat_options">
           <button><AttachFileIcon></AttachFileIcon></button>
+          <button><AddTaskIcon></AddTaskIcon></button>
         </div>
         <input type="text" placeholder='Escribe Aqui' />
           <button className="btn" onClick={enviar}>Enviar <SendIcon></SendIcon></button>
