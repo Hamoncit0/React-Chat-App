@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import './main-page.css'
+
 import Chat from '../chat/chat'
 import Header from '../header/header'
 import NewChat from '../new-chat/newChat'
 import ChatBox from '../chat-box/chatBox'
+
+
 import SearchIcon from '@mui/icons-material/Search';
 import { TextField, InputAdornment } from '@mui/material';
 import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
-import { useUserStore } from '../../lib/userStore'
-import { doc, getDoc, onSnapshot, onSnapshotsInSync } from 'firebase/firestore'
+
+
+import { doc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
+import { useUserStore } from '../../lib/userStore'
+import { useChatStore } from '../../lib/chatStore'
+
+
 function mainPage() {
   //new chat modal
   const [modal, setModal] = useState(false);
@@ -22,6 +30,8 @@ function mainPage() {
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
   const {currentUser} = useUserStore();
+  const {changeChat} = useChatStore();
+  const {chatId} = useChatStore();
 
   useEffect(()=>{
     const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res)=>{
@@ -43,6 +53,11 @@ function mainPage() {
     }
   }, [currentUser.id])
 
+  const handleSelect = async (chat) => {
+    console.log('Chat seleccionado:', chat);  // Verificar qué chat se está seleccionando
+    if (!chat?.chatId || !chat?.user) return;  // Verificar si chatId y user están presentes
+    changeChat(chat.chatId, chat.user);
+  };
 
 
 
@@ -70,13 +85,17 @@ function mainPage() {
         />
         </div>
         {chats.map((chat)=>(
-          <ChatBox key="chat.chatId" chatName={chat.user} chatPicture={chat.picture} ></ChatBox>
+          <ChatBox 
+          onClick={() => handleSelect(chat)} 
+          key={chat.chatId} 
+          chatName={chat.user.username} 
+          chatPicture={chat.user.avatar}/>
         ))}
 
       </div>
 
         <div className="chat_space">
-          <Chat></Chat>
+          {chatId && <Chat></Chat>}
         </div>
       </div>
       {modal && (

@@ -16,7 +16,8 @@
     flex-grow: 1; /* Permite que este contenedor crezca y ocupe el espacio disponible */
     overflow-y: auto; /* Habilita el scroll vertical si el contenido excede la altura */
     padding: 10px;
-    margin-bottom: 80px
+    margin-bottom: 80px;
+    height: 100vh;
 }
 .msg{
     display: flex;

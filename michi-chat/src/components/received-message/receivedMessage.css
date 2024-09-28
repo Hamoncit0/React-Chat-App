@@ -1,0 +1,29 @@
+
+.msg{
+    display: flex;
+    justify-content: flex-start;
+}
+.msg-sender{
+    display: flex;
+    justify-content: flex-end;
+}
+.receptor_img img{
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    margin: 10px;
+}
+.msg_content{
+    background-color: var(--background-accent);
+    border-radius: 20px;
+    padding: 15px;
+    margin: 10px;
+    max-width: 50%;
+}
+.msg_content_sender{
+    background-color: var(--color-primary);
+    border-radius: 20px;
+    padding: 15px;
+    margin: 10px;
+    max-width: 50%;
+}

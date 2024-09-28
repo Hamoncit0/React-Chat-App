@@ -3,12 +3,14 @@ import './newChat.css';
 import SearchIcon from '@mui/icons-material/Search';
 import { TextField, InputAdornment } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+
 import { db } from '../../lib/firebase';
-import { collection, getDocs, query, where, orderBy, startAt, endAt, serverTimestamp, arrayUnion, doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, startAt, endAt, serverTimestamp, arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useUserStore } from '../../lib/userStore';
 
 function NewChat({ isOpen, closeModal, children }) {
 
+  const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]); // Cambié de 'user' a 'users' para manejar múltiples resultados
   const [searchTerm, setSearchTerm] = useState('');
   const {currentUser} = useUserStore();
@@ -35,6 +37,12 @@ function NewChat({ isOpen, closeModal, children }) {
       );
 
       const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        setUser(querySnapshot.docs[0].data());
+      } else {
+        setUser(null); // Si no se encuentran usuarios
+      }
+
 
       const foundUsers = querySnapshot.docs.map(doc => doc.data());
       setUsers(foundUsers); // Almacenar todos los usuarios encontrados
@@ -46,11 +54,11 @@ function NewChat({ isOpen, closeModal, children }) {
 
   const handleAdd = async()=>{
     const chatRef = collection(db, "chats")
-    const userChatsRef = collection(db, "chats")
+    const userChatsRef = collection(db, "userchats")
 
     try{
-        const newChatRef = doc(chatRef)
-        await setDoc(chatRef, {
+        const newChatRef = doc(chatRef);
+        await setDoc(newChatRef, {
             createdAt: serverTimestamp(),
             messages: [],
         });
