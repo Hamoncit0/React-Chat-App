@@ -53,9 +53,7 @@ function mainPage() {
     }
   }, [currentUser.id])
 
-  const handleSelect = async (chat) => {
-    console.log('Chat seleccionado:', chat);  // Verificar qué chat se está seleccionando
-    if (!chat?.chatId || !chat?.user) return;  // Verificar si chatId y user están presentes
+  const handleSelect = async (chat) => { // Verificar si chatId y user están presentes
     changeChat(chat.chatId, chat.user);
   };
 
@@ -85,11 +83,14 @@ function mainPage() {
         />
         </div>
         {chats.map((chat)=>(
-          <ChatBox 
-          onClick={() => handleSelect(chat)} 
-          key={chat.chatId} 
-          chatName={chat.user.username} 
-          chatPicture={chat.user.avatar}/>
+          <div onClick={() => handleSelect(chat)} key={chat.chatId}>
+            <ChatBox
+            chatName={chat.user.username} 
+            lastMessage={chat.lastMessage}
+            time={new Date(chat.updatedAt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            chatPicture={chat.user.avatar}/>
+          </div>
+          
         ))}
 
       </div>

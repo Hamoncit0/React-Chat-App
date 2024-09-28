@@ -9,14 +9,21 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 import SentMessage from '../sent-message/sentMessage';
 import ReceivedMessage from '../received-message/receivedMessage';
 import { useChatStore } from '../../lib/chatStore';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { useUserStore } from '../../lib/userStore';
 
 
 function chat() {
+  const [text, setText] = useState("");
   const [chat, setChat] = useState();
   const scrollRef = useRef(null);
-  const {chatId} = useChatStore();
+  const {chatId, user} = useChatStore();
+  const {currentUser} = useUserStore();
+  const [img, setImg] = useState({
+    file: null,
+    url: "",
+  });
 
   // Desplázate al final del div cuando el componente se renderice o el contenido cambie
   useEffect(() => {
@@ -42,12 +49,64 @@ function chat() {
     }
   };
 
-  const enviar = () =>{
-  }
+ 
+  const handleSend = async () => {
+    if (text === "") return;
+
+    let imgUrl = null;
+
+    try {
+      if (img.file) {
+        imgUrl = await upload(img.file);
+      }
+
+      await updateDoc(doc(db, "chats", chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.id,
+          text,
+          createdAt: new Date(),
+          ...(imgUrl && { img: imgUrl }),
+        }),
+      });
+
+      const userIDs = [currentUser.id, user.id];
+
+      userIDs.forEach(async (id) => {
+        const userChatsRef = doc(db, "userchats", id);
+        const userChatsSnapshot = await getDoc(userChatsRef);
+
+        if (userChatsSnapshot.exists()) {
+          const userChatsData = userChatsSnapshot.data();
+
+          const chatIndex = userChatsData.chats.findIndex(
+            (c) => c.chatId === chatId
+          );
+
+          userChatsData.chats[chatIndex].lastMessage = text;
+          userChatsData.chats[chatIndex].isSeen =
+            id === currentUser.id ? true : false;
+          userChatsData.chats[chatIndex].updatedAt = Date.now();
+
+          await updateDoc(userChatsRef, {
+            chats: userChatsData.chats,
+          });
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    } finally{
+    setImg({
+      file: null,
+      url: "",
+    });
+
+    setText("");
+    }
+  };
   return (
     <div className='chat'>
       <div className="chat_name">
-        <h2>el gato</h2>
+        <h2>{user.username}</h2>
         <div className="chat_options">
           <button><VideocamIcon></VideocamIcon></button>
           <button><CallIcon></CallIcon></button>
@@ -55,17 +114,40 @@ function chat() {
       </div>
       
       <div className="chat_content" ref={scrollRef} >
-        
-        <SentMessage/>
-        <ReceivedMessage/>
+        {chat?.messages?.map((message) => (
+          <div key={message?.createdAt}>
+            {message.senderId === currentUser.id ?(
+              
+            <SentMessage 
+              msgImg={message.img} 
+              msgText={message.text} 
+              msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
+              userImg={currentUser.avatar} />
+            ):(
+              
+            <ReceivedMessage 
+              msgImg={message.img} 
+              msgText={message.text} 
+              msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
+              userImg={user.avatar} />
+            )
+
+            }
+          </div>
+          
+        ))
+
+        }
       </div>
       <div className="chat_bar" >
         <div className="chat_options">
           <button><AttachFileIcon></AttachFileIcon></button>
           <button><AddTaskIcon></AddTaskIcon></button>
         </div>
-        <input type="text" placeholder='Escribe Aqui' />
-          <button className="btn" onClick={enviar}>Enviar <SendIcon></SendIcon></button>
+        <input type="text" placeholder='Escribe Aqui'
+          value={text}
+          onChange={(e) => setText(e.target.value)} />
+          <button className="btn" onClick={handleSend}>Enviar <SendIcon></SendIcon></button>
       </div>
 
     </div>

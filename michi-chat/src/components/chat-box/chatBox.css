@@ -1,0 +1,7 @@
+.chat-box-pfp{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+}

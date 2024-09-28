@@ -44,7 +44,8 @@ function signup({isOpen, closeModal, children}) {
         avatar: imgUrl,
         id: res.user.uid,
         firstName,
-        lastName
+        lastName,
+        blocked: [],
       });
 
       await setDoc(doc(db, "userchats", res.user.uid), {

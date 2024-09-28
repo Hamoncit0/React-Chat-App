@@ -25,7 +25,7 @@
 .chat_space {
     height: 100%;
     flex: 1; /* Ocupa el resto del espacio disponible */
-    background-color: blueviolet;
+    background-color: var(--background-secondary);
 }
 
 .search{
