@@ -12,7 +12,7 @@ import { TextField, InputAdornment } from '@mui/material';
 import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
 
 
-import { doc, getDoc, onSnapshot } from 'firebase/firestore'
+import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import { useUserStore } from '../../lib/userStore'
 import { useChatStore } from '../../lib/chatStore'
@@ -54,7 +54,28 @@ function mainPage() {
   }, [currentUser.id])
 
   const handleSelect = async (chat) => { // Verificar si chatId y user están presentes
-    changeChat(chat.chatId, chat.user);
+   
+    const userChats = chats.map((item) => {
+      const { user, ...rest } = item;
+      return rest;
+    });
+
+    const chatIndex = userChats.findIndex(
+      (item) => item.chatId === chat.chatId
+    );
+
+    userChats[chatIndex].isSeen = true;
+
+    const userChatsRef = doc(db, "userchats", currentUser.id);
+
+    try {
+      await updateDoc(userChatsRef, {
+        chats: userChats,
+      });
+      changeChat(chat.chatId, chat.user);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
 
@@ -87,7 +108,8 @@ function mainPage() {
             <ChatBox
             chatName={chat.user.username} 
             lastMessage={chat.lastMessage}
-            time={new Date(chat.updatedAt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            seen={chat.isSeen}
+            time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             chatPicture={chat.user.avatar}/>
           </div>
           

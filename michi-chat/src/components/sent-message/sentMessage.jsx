@@ -8,6 +8,8 @@ function sentMessage({msgImg, msgText, msgTime, userImg}) {
             <div className="msg_text">
               <p>{msgText}</p>
             </div>
+            {msgImg ? (
+            <img src={msgImg} alt="" />):(<div></div>)}
             <div className="msg_time">
               <span>{msgTime}</span>
             </div>

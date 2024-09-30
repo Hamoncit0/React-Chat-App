@@ -12,6 +12,7 @@ import { useChatStore } from '../../lib/chatStore';
 import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useUserStore } from '../../lib/userStore';
+import upload from "../../lib/upload";
 
 
 function chat() {
@@ -27,8 +28,10 @@ function chat() {
 
   // Desplázate al final del div cuando el componente se renderice o el contenido cambie
   useEffect(() => {
-    scrollToBottom();
-  }, []);
+    if (chat?.messages) {
+      scrollToBottom();
+    }
+  }, [chat?.messages]);
 
   useEffect(() => {
     if (!chatId) return; // Asegúrate de que chatId esté definido
@@ -49,9 +52,17 @@ function chat() {
     }
   };
 
+  const handleImg = (e) => {
+    if (e.target.files[0]) {
+      setImg({
+        file: e.target.files[0],
+        url: URL.createObjectURL(e.target.files[0]),
+      });
+    }
+  };
  
   const handleSend = async () => {
-    if (text === "") return;
+    if (text === "" && img.url === "") return;
 
     let imgUrl = null;
 
@@ -139,9 +150,15 @@ function chat() {
 
         }
       </div>
+      {img.url && 
+      <div className="img-preview">
+        <p>Img preview:</p>
+         <img src={img.url} alt=""/>
+      </div>}
       <div className="chat_bar" >
         <div className="chat_options">
-          <button><AttachFileIcon></AttachFileIcon></button>
+          <input type="file" name="file-upload" id="file-upload" onChange={handleImg} />
+          <label htmlFor="file-upload"><AttachFileIcon></AttachFileIcon></label>
           <button><AddTaskIcon></AddTaskIcon></button>
         </div>
         <input type="text" placeholder='Escribe Aqui'

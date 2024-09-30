@@ -22,10 +22,12 @@
 .msg{
     display: flex;
     justify-content: flex-start;
+    word-wrap: break-word;
 }
 .msg-sender{
     display: flex;
     justify-content: flex-end;
+    word-wrap: break-word;
 }
 .receptor_img img{
     height: 50px;
@@ -88,4 +90,40 @@
     cursor: pointer;
     background-color: var(--color-active);
     transition: background-color 100ms linear;
+}
+.chat_options label{
+    color: white;
+    font-size: larger;
+    margin: 2px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-accent);
+    border-radius: 50%;
+    height: fit-content;
+    display: flex;
+}
+.chat_options label:hover{
+    cursor: pointer;
+    background-color: var(--color-active);
+    transition: background-color 100ms linear;
+}
+
+.chat_options input{
+    display: none;
+}
+.img-preview{
+    width: 70%;
+    color: white;
+    position:fixed;
+    bottom: 60px;
+    display: flex;
+    justify-content: space-between;
+    max-height: 20vh;
+    height: 100%;
+    background-color: var(--color-secondary);
+    opacity: 90%;
+}
+.img-preview img{
+    height: 100%;
 }
