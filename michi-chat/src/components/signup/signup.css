@@ -89,3 +89,6 @@
 .signup_button:hover{
     cursor: pointer;
 }
+.error{
+    color: red;
+}
