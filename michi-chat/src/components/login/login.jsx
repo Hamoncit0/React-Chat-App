@@ -44,10 +44,10 @@ function login() {
       <h2 className='title'>¡Bienvenido!</h2>
       <form onSubmit={handleLogin} className='login_form'>
         <div className='formfield'>
-          <input type="text" placeholder='Correo electrónico' name="email" />
+          <input type="text" placeholder='Correo electrónico' name="email" required/>
         </div>
         <div className='formfield'>
-          <input type="password" placeholder='Contraseña' name="password" />
+          <input type="password" placeholder='Contraseña' name="password" required />
         </div>
         <button className='login_button'>Iniciar Sesión</button>
         <div>
