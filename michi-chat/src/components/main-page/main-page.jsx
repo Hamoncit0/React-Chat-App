@@ -4,6 +4,7 @@ import './main-page.css'
 import Chat from '../chat/chat'
 import Header from '../header/header'
 import NewChat from '../new-chat/newChat'
+import NewGroupChat from '../new-group-chat/newGroupChat'
 import ChatBox from '../chat-box/chatBox'
 
 
@@ -18,14 +19,24 @@ import { useUserStore } from '../../lib/userStore'
 import { useChatStore } from '../../lib/chatStore'
 
 
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+
+
 function mainPage() {
   //new chat modal
   const [modal, setModal] = useState(false);
+  const [groupModal, setGroupModal] = useState(false);
 
   const toggleModal = ()=>{
     setModal(!modal)
+    handleClose();
   }
 
+  const toggleGroupModal = () => {
+    setGroupModal(!groupModal);
+    handleClose();
+  };
   //chats
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
@@ -77,7 +88,15 @@ function mainPage() {
       console.log(err);
     }
   };
-
+  ////////////DROPDOWN MENU//////////
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
 
   return (
@@ -85,11 +104,17 @@ function mainPage() {
       <div>
         <Header></Header>
       </div>
-      <div className={`login ${modal ? 'blur-background' : ''} main`}>
+      <div className={`login ${modal || groupModal ? 'blur-background' : ''} main`}>
         
       <div className="chat_list">
         <div className="search">
-          <button onClick={toggleModal}><AddToPhotosIcon sx={{ fontSize: 40 }}></AddToPhotosIcon></button>
+          <button 
+          id="chat-button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          ><AddToPhotosIcon sx={{ fontSize: 40 }}></AddToPhotosIcon></button>
         <TextField
           placeholder="Search..."
           className="custom-input"
@@ -128,7 +153,28 @@ function mainPage() {
               </div>
         </div>
       )}
+      {groupModal && (
+        <div className="modal">
+              <div className="overlay">
+                <NewGroupChat closeModal={toggleGroupModal}></NewGroupChat>
+              </div>
+        </div>
+      )}
+      <Menu
+        className='dropdown-menu'
+        id="chat-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        <MenuItem onClick={toggleModal}>Chat nuevo</MenuItem>
+        <MenuItem onClick={toggleGroupModal}>Chat grupal nuevo</MenuItem>
+      </Menu>
     </div>
+
   )
 }
 

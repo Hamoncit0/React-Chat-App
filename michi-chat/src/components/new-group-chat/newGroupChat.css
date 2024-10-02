@@ -1,0 +1,107 @@
+.new-group-chat{
+    margin: auto;
+    margin-top: calc(8% + 40px);
+    width: 50%;
+    min-height: 50vh;
+    max-height: 60vh;
+    padding: 2rem;
+    background-color: var(--background-color);
+    border: 4px solid var(--color-primary);
+    border-radius: 20px;
+    border-style: dashed;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.new-chat-search{
+    position: sticky;
+    top: 0;
+    display: flex;
+}
+.new-chat-search .custom-input{
+    width: 500vw;
+}
+.new-groupchat-list{
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    padding: 1rem;
+    height: max-content;
+    margin: auto;
+    margin-top: 3%;
+    margin-bottom: 5rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.new-groupchat-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+    border-bottom: 4px dashed var(--color-primary) ;
+    &:last-child{
+        border-bottom: none;
+    }
+}
+.new-groupchat-item img{
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+}
+.new-groupchat-item .btn{
+    padding: 0.8rem;
+    border-radius: 50%;
+}
+.close_button{
+    padding: 5px;
+    margin: 10px;
+    font-weight: bold;
+    border: 0;
+    border-radius: 50px;
+    background-color: var(--color-primary);
+    align-self: center;
+
+}
+.close_button:hover{
+    cursor: pointer;
+
+}
+.new-group-list{
+    display: flex;
+    position:absolute;
+    bottom: 0;
+    margin: auto;
+    margin-bottom: 0.5rem;
+    width:90%;
+    justify-content: space-between;
+    .btn{
+        margin-left: 20px;
+    }
+}
+.gc-new-item{
+    display: flex;
+    background-color: var(--background-secondary);
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 30px;
+    border: 4px dashed var(--color-primary);
+    margin-right: 10px;
+    h2{
+        margin-right: 10px;
+    }
+    .btn-cerrar{
+        border-radius: 50%;
+        padding: 0.3rem;
+        margin-left: 4px;
+        transition: background-color .2s;
+    }
+    .btn-cerrar:hover{
+        background-color: var(--color-primary);
+        cursor: pointer;
+    }
+}
+.items{
+    display: flex;
+    overflow-x: scroll;
+}

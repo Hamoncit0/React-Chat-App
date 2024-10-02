@@ -1,6 +1,6 @@
 .new-chat{
     margin: auto;
-    margin-top: 8%;
+    margin-top: calc(8% + 90px);
     width: 50%;
     height: 50vh;
     padding: 2rem;
