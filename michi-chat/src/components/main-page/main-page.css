@@ -17,9 +17,15 @@
     background-color: var(--background-color);
     margin: 0;
     flex: 0.4;
+    border-right: dashed 4px var(--color-primary);
+}
+.list{
+    height: 75%;
     display: flex;
     flex-direction: column;
-    border-right: dashed 4px var(--color-primary);
+    flex: 1;
+    overflow-y: scroll;
+
 }
 
 .chat_space {
@@ -33,6 +39,10 @@
     display: flex;
     color: var(--color-accent);
     padding: 10px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1;
 }
 .custom-input {
     width: 100%;

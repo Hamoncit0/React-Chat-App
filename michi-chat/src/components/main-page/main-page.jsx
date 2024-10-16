@@ -126,32 +126,35 @@ function mainPage() {
             />
           </div>
 
-          {/* Render chat list */}
-          {chats.map((chat) => (
-            <div onClick={() => handleSelect(chat)} key={chat.chatId}>
-              {chat.isGroupChat ? (
-                <ChatBox
-                  chatName={chat.groupName}
-                  lastMessage={chat.lastMessage}
-                  seen={chat.isSeen}
-                  time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  chatPicture={'/path-to-group-avatar.png'} // Default group avatar
-                />
-              ) : (
-                chat.user ? (
-                  <ChatBox
-                    chatName={chat.user.username}
-                    lastMessage={chat.lastMessage}
-                    seen={chat.isSeen}
-                    time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    chatPicture={chat.user.avatar}
-                  />
-                ) : (
-                  <div>No se pudo cargar la información del usuario</div>
-                )
-              )}
-            </div>
-          ))}
+          <div className="list">
+              {/* Render chat list */}
+              {chats.map((chat) => (
+                <div onClick={() => handleSelect(chat)} key={chat.chatId}>
+                  {chat.isGroupChat ? (
+                    <ChatBox
+                      chatName={chat.groupName}
+                      lastMessage={chat.lastMessage}
+                      seen={chat.isSeen}
+                      time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      chatPicture={'/path-to-group-avatar.png'} // Default group avatar
+                    />
+                  ) : (
+                    chat.user ? (
+                      <ChatBox
+                        chatName={chat.user.username}
+                        lastMessage={chat.lastMessage}
+                        seen={chat.isSeen}
+                        time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        chatPicture={chat.user.avatar}
+                      />
+                    ) : (
+                      <div>No se pudo cargar la información del usuario</div>
+                    )
+                  )}
+                </div>
+              ))}
+          </div>
+          
         </div>
 
         <div className="chat_space">
