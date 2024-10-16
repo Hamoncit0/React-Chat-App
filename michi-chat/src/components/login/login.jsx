@@ -66,7 +66,7 @@ function Login() {
                 type="text" 
                 placeholder="Correo electrónico" 
                 name="email" 
-                required 
+                 
               />
             </div>
             <div className="formfield">
@@ -74,7 +74,7 @@ function Login() {
                 type="password" 
                 placeholder="Contraseña" 
                 name="password" 
-                required 
+                 
               />
             </div>
             <button className="login_button" disabled={loading}>

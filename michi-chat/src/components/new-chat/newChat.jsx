@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'; // Importar toast
 import { 
   collection, getDocs, query, where, orderBy, 
   startAt, endAt, serverTimestamp, arrayUnion, 
-  doc, setDoc, updateDoc 
+  doc, setDoc, updateDoc, getDoc
 } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useUserStore } from '../../lib/userStore';
@@ -43,38 +43,40 @@ function NewChat({ isOpen, closeModal }) {
     }
   };
 
-  const handleAdd = async()=>{
+  const handleAdd = async (selectedUser) => {
     if (selectedUser.id === currentUser.id) {
       toast.warning('No puedes crear un chat contigo mismo.');
       return;
     }
-    
-    const chatRef = collection(db, "chats")
-    const userChatsRef = collection(db, "userchats")
-
+  
+    const chatRef = collection(db, "chats");
+    const userChatsRef = collection(db, "userchats");
+  
     try {
-      const q = query(
-        chatRef,
-        where("participants", "array-contains", currentUser.id)
-      );
-      const querySnapshot = await getDocs(q);
+       // Verificar si el currentUser ya tiene un chat con el selectedUser
+    const currentUserChatsDoc = await getDoc(doc(userChatsRef, currentUser.id));
 
-      const chatExists = querySnapshot.docs.some((doc) =>
-        doc.data().participants.includes(selectedUser.id)
-      );
+    // Revisar los chats del currentUser
+    if (currentUserChatsDoc.exists()) {
+      const currentUserChats = currentUserChatsDoc.data().chats || [];
+      
+      const chatExists = currentUserChats.some(chat => chat.receiverId === selectedUser.id);
 
       if (chatExists) {
         toast.info('Ya tienes un chat con este usuario.');
         return;
       }
-
+    }
+  
+      // Si no existe el chat, lo creamos
       const newChatRef = doc(chatRef);
       await setDoc(newChatRef, {
         createdAt: serverTimestamp(),
         messages: [],
         participants: [currentUser.id, selectedUser.id],
       });
-
+  
+      // Actualizamos las referencias de los usuarios involucrados
       await updateDoc(doc(userChatsRef, selectedUser.id), {
         chats: arrayUnion({
           chatId: newChatRef.id,
@@ -83,7 +85,7 @@ function NewChat({ isOpen, closeModal }) {
           updatedAt: Date.now(),
         }),
       });
-
+  
       await updateDoc(doc(userChatsRef, currentUser.id), {
         chats: arrayUnion({
           chatId: newChatRef.id,
@@ -92,14 +94,13 @@ function NewChat({ isOpen, closeModal }) {
           updatedAt: Date.now(),
         }),
       });
-
+  
       toast.success('Chat creado exitosamente.');
     } catch (err) {
       console.error(err);
       toast.error('Error al crear el chat.');
     }
   };
-
   return (
     <div className="new-chat">
       <div className="new-chat-search">
