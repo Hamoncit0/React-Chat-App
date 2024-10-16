@@ -42,6 +42,9 @@
     margin: 10px;
     max-width: 50%;
 }
+.msg_content img{
+    width: 100%;
+}
 .msg_content_sender{
     background-color: var(--color-primary);
     border-radius: 20px;
@@ -50,6 +53,9 @@
     max-width: 50%;
 }
 
+.msg_content_sender img{
+    width: 100%;
+}
 .chat_bar{
     background-color: var(--color-active-secondary);
     height: 60px;

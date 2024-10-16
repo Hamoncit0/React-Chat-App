@@ -17,7 +17,7 @@ function NewChat({ isOpen, closeModal, children }) {
 
 
   const handleSearch = async (e) => {
-    const username = e.target.value.toLowerCase(); // Convertir el término de búsqueda a minúsculas
+    const username = e.target.value; // Convertir el término de búsqueda a minúsculas
     setSearchTerm(username);
 
     if (username.trim() === '') {
@@ -52,7 +52,7 @@ function NewChat({ isOpen, closeModal, children }) {
     }
   };
 
-  const handleAdd = async()=>{
+  const handleAdd = async(selectedUser)=>{
     const chatRef = collection(db, "chats")
     const userChatsRef = collection(db, "userchats")
 
@@ -63,7 +63,7 @@ function NewChat({ isOpen, closeModal, children }) {
             messages: [],
         });
 
-        await updateDoc(doc(userChatsRef, user.id),{
+        await updateDoc(doc(userChatsRef, selectedUser.id),{
             chats: arrayUnion({
                 chatId: newChatRef.id,
                 lastmessage: "",
@@ -76,7 +76,7 @@ function NewChat({ isOpen, closeModal, children }) {
             chats: arrayUnion({
                 chatId: newChatRef.id,
                 lastmessage: "",
-                receiverId: user.id,
+                receiverId: selectedUser.id,
                 updatedAt: Date.now()
             })
         })
@@ -113,7 +113,7 @@ function NewChat({ isOpen, closeModal, children }) {
             <div key={index} className='new-chat-item'>
               <img src={user.avatar || 'src/assets/pictures/avatar-blank.png'} alt='' />
               <h2>{user.username}</h2>
-              <button onClick={handleAdd} className='btn'>Enviar mensaje</button>
+              <button onClick={() => handleAdd(user)} className='btn'>Enviar mensaje</button>
             </div>
           ))
         ) : (
