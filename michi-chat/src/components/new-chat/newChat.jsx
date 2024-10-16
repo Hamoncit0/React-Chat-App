@@ -3,117 +3,141 @@ import './newChat.css';
 import SearchIcon from '@mui/icons-material/Search';
 import { TextField, InputAdornment } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-
+import { toast } from 'react-toastify'; // Importar toast
+import { 
+  collection, getDocs, query, where, orderBy, 
+  startAt, endAt, serverTimestamp, arrayUnion, 
+  doc, setDoc, updateDoc 
+} from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { collection, getDocs, query, where, orderBy, startAt, endAt, serverTimestamp, arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useUserStore } from '../../lib/userStore';
 
-function NewChat({ isOpen, closeModal, children }) {
-
-  const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([]); // Cambié de 'user' a 'users' para manejar múltiples resultados
+function NewChat({ isOpen, closeModal }) {
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const {currentUser} = useUserStore();
-
+  const { currentUser } = useUserStore();
 
   const handleSearch = async (e) => {
-    const username = e.target.value.toLowerCase(); // Convertir el término de búsqueda a minúsculas
+    const username = e.target.value.toLowerCase();
     setSearchTerm(username);
 
     if (username.trim() === '') {
-      setUsers([]); // Limpiar la lista si no hay texto
+      setUsers([]);
       return;
     }
 
     try {
       const userRef = collection(db, 'users');
-
-      // Realizar la búsqueda parcial, Firestore no tiene LIKE, pero podemos simularlo
       const q = query(
         userRef, 
         orderBy('username'), 
         startAt(username), 
-        endAt(username + '\uf8ff') // \uf8ff es el carácter Unicode más alto para garantizar coincidencias
+        endAt(username + '\uf8ff')
       );
-
       const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        setUser(querySnapshot.docs[0].data());
-      } else {
-        setUser(null); // Si no se encuentran usuarios
-      }
-
-
       const foundUsers = querySnapshot.docs.map(doc => doc.data());
-      setUsers(foundUsers); // Almacenar todos los usuarios encontrados
-
+      setUsers(foundUsers);
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      toast.error('Error al buscar usuarios. Inténtalo de nuevo.');
     }
   };
 
-  const handleAdd = async()=>{
-    const chatRef = collection(db, "chats")
-    const userChatsRef = collection(db, "userchats")
-
-    try{
-        const newChatRef = doc(chatRef);
-        await setDoc(newChatRef, {
-            createdAt: serverTimestamp(),
-            messages: [],
-        });
-
-        await updateDoc(doc(userChatsRef, user.id),{
-            chats: arrayUnion({
-                chatId: newChatRef.id,
-                lastmessage: "",
-                receiverId: currentUser.id,
-                updatedAt: Date.now()
-            })
-        });
-        
-        await updateDoc(doc(userChatsRef, currentUser.id),{
-            chats: arrayUnion({
-                chatId: newChatRef.id,
-                lastmessage: "",
-                receiverId: user.id,
-                updatedAt: Date.now()
-            })
-        })
-    }catch(err){
-        console.log(err);
+  const handleAdd = async (selectedUser) => {
+    if (selectedUser.id === currentUser.id) {
+      toast.warning('No puedes crear un chat contigo mismo.');
+      return;
     }
-  }
+
+    const chatRef = collection(db, "chats");
+    const userChatsRef = collection(db, "userchats");
+
+    try {
+      const q = query(
+        chatRef,
+        where("participants", "array-contains", currentUser.id)
+      );
+      const querySnapshot = await getDocs(q);
+
+      const chatExists = querySnapshot.docs.some((doc) =>
+        doc.data().participants.includes(selectedUser.id)
+      );
+
+      if (chatExists) {
+        toast.info('Ya tienes un chat con este usuario.');
+        return;
+      }
+
+      const newChatRef = doc(chatRef);
+      await setDoc(newChatRef, {
+        createdAt: serverTimestamp(),
+        messages: [],
+        participants: [currentUser.id, selectedUser.id],
+      });
+
+      await updateDoc(doc(userChatsRef, selectedUser.id), {
+        chats: arrayUnion({
+          chatId: newChatRef.id,
+          lastmessage: "",
+          receiverId: currentUser.id,
+          updatedAt: Date.now(),
+        }),
+      });
+
+      await updateDoc(doc(userChatsRef, currentUser.id), {
+        chats: arrayUnion({
+          chatId: newChatRef.id,
+          lastmessage: "",
+          receiverId: selectedUser.id,
+          updatedAt: Date.now(),
+        }),
+      });
+
+      toast.success('Chat creado exitosamente.');
+    } catch (err) {
+      console.error(err);
+      toast.error('Error al crear el chat.');
+    }
+  };
+
   return (
-    <div className='new-chat'>
-      <div className='new-chat-search'>
+    <div className="new-chat">
+      <div className="new-chat-search">
         <TextField
           value={searchTerm}
           onChange={handleSearch}
-          placeholder='Search...'
-          className='custom-input'
+          placeholder="Search..."
+          className="custom-input"
           InputProps={{
             startAdornment: (
-              <InputAdornment position='start'>
+              <InputAdornment position="start">
                 <SearchIcon sx={{ fontSize: 40 }} />
               </InputAdornment>
             ),
           }}
-          variant='outlined'
+          variant="outlined"
         />
-        <div className='close'>
-          <button className='close_button' onClick={closeModal}>
-            <CloseIcon fontSize='medium' />
+        <div className="close">
+          <button className="close_button" onClick={closeModal}>
+            <CloseIcon fontSize="medium" />
           </button>
         </div>
       </div>
-      <div className='new-chat-list'>
+      <div className="new-chat-list">
         {users.length > 0 ? (
           users.map((user, index) => (
-            <div key={index} className='new-chat-item'>
-              <img src={user.avatar || 'src/assets/pictures/avatar-blank.png'} alt='' />
+            <div key={index} className="new-chat-item">
+              <img 
+                src={user.avatar || 'src/assets/pictures/avatar-blank.png'} 
+                alt="" 
+              />
               <h2>{user.username}</h2>
-              <button onClick={handleAdd} className='btn'>Enviar mensaje</button>
+              <button 
+                onClick={() => handleAdd(user)} 
+                className="btn"
+              >
+                Enviar mensaje
+              </button>
             </div>
           ))
         ) : (
