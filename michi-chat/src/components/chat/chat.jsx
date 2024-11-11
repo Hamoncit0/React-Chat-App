@@ -13,9 +13,13 @@ import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firesto
 import { db } from '../../lib/firebase';
 import { useUserStore } from '../../lib/userStore';
 import upload from "../../lib/upload";
+import { useNavigate } from 'react-router-dom';
+import io from 'socket.io-client';
 
+const socket = io('http://localhost:5000');
 
 function chat() {
+  const navigate = useNavigate(); // Hook para navegar a la ruta de la llamada
   const [text, setText] = useState("");
   const [chat, setChat] = useState();
   const scrollRef = useRef(null);
@@ -25,7 +29,37 @@ function chat() {
     file: null,
     url: "",
   });
+  const [incomingCall, setIncomingCall] = useState(null);
 
+  useEffect(() => {
+    // Envía el userId al servidor al conectarse
+    socket.emit('register-user', currentUser.id);
+
+    socket.on('incoming-call', ({ callerId, roomId }) => {
+      setIncomingCall({ callerId, roomId });
+    });
+
+    // Limpia el socket al desmontar el componente
+    return () => {
+      socket.off('incoming-call');
+    };
+  }, [currentUser.id]);
+
+  const startVideoCall = () => {
+    socket.emit('call-user', {
+      callerId: currentUser.id,
+      receiverId: user.id, // ID del destinatario desde el contexto de chat o la sesión actual
+      roomId: user.id, // Usa el ID del destinatario como roomId
+    });
+    navigate(`/call/${user.id}`);
+  };
+
+  const acceptCall = () => {
+    if (incomingCall) {
+      navigate(`/call/${incomingCall.roomId}`);
+      setIncomingCall(null);
+    }
+  };
   // Desplázate al final del div cuando el componente se renderice o el contenido cambie
   useEffect(() => {
     if (chat?.messages) {
@@ -116,10 +150,18 @@ function chat() {
   };
   return (
     <div className='chat'>
+       {/* Mostrar alerta de llamada entrante si hay una */}
+       {incomingCall && (
+        <div className="call-notification">
+          <p>Incoming call from {incomingCall.callerId}</p>
+          <button onClick={acceptCall}>Accept Call</button>
+        </div>
+      )}
+      {/* Resto del código del chat */}
       <div className="chat_name">
         <h2>{user.username}</h2>
         <div className="chat_options">
-          <button><VideocamIcon></VideocamIcon></button>
+          <button onClick={startVideoCall}><VideocamIcon></VideocamIcon></button>
           <button><CallIcon></CallIcon></button>
         </div>
       </div>

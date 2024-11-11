@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './lib/firebase'
 import { useUserStore } from './lib/userStore'
+import Videocall from './components/videocall/videocall'
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
@@ -59,6 +60,7 @@ function App() {
       <Routes>
         <Route path="/" element={currentUser ? <Navigate to="/main" /> : <Login />} />
         <Route path="/main" element={currentUser ? <MainPage /> : <Navigate to="/" />} />
+        <Route path="/call/:roomId" element={currentUser ? <Videocall /> : <Navigate to="/" />} />
         <Route path="/tiendita" element={currentUser ? 
           <>
             <Header />

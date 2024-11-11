@@ -14,9 +14,17 @@ const io = new Server(server, {
 
 app.use(cors());
 
+const connectedUsers = {}; // Diccionario para almacenar userId -> socketId
+
 // Eventos de Socket.IO para señalización
 io.on('connection', (socket) => {
   console.log('Usuario conectado:', socket.id);
+
+  // Registrar el userId en el servidor cuando un usuario se conecta
+  socket.on('register-user', (userId) => {
+    connectedUsers[userId] = socket.id;
+    console.log(`User registered: ${userId} -> ${socket.id}`);
+  });
 
   socket.on('join-room', (roomId) => {
     socket.join(roomId);
@@ -31,13 +39,29 @@ io.on('connection', (socket) => {
     socket.to(roomId).emit('answer', answer);
   });
 
+  // Escucha la llamada y envía la notificación al receptor
+  socket.on('call-user', ({ callerId, receiverId, roomId }) => {
+    const receiverSocketId = connectedUsers[receiverId];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('incoming-call', { callerId, roomId });
+    } else {
+      console.log(`User ${receiverId} not connected`);
+    }
+  });
+
   // Manejo de candidatos ICE
   socket.on('candidate', (roomId, candidate) => {
     socket.to(roomId).emit('candidate', candidate);
   });
 
   socket.on('disconnect', () => {
-    console.log('Usuario desconectado:', socket.id);
+    for (const userId in connectedUsers) {
+      if (connectedUsers[userId] === socket.id) {
+        delete connectedUsers[userId];
+        console.log(`User disconnected: ${userId}`);
+        break;
+      }
+    }
   });
 });
 
