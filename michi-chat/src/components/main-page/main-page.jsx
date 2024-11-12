@@ -1,27 +1,33 @@
-import React, { useEffect, useState } from 'react'
-import './main-page.css'
+import React, { useEffect, useState } from 'react';
+import './main-page.css';
 
-import Chat from '../chat/chat'
-import Header from '../header/header'
-import NewChat from '../new-chat/newChat'
-import NewGroupChat from '../new-group-chat/newGroupChat'
-import ChatBox from '../chat-box/chatBox'
+import Chat from '../chat/chat';
+import Header from '../header/header';
+import NewChat from '../new-chat/newChat';
+import NewGroupChat from '../new-group-chat/newGroupChat';
+import ChatBox from '../chat-box/chatBox';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { TextField, InputAdornment } from '@mui/material';
 import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
 
-import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore'
-import { db } from '../../lib/firebase'
-import { useUserStore } from '../../lib/userStore'
-import { useChatStore } from '../../lib/chatStore'
+import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+import { useUserStore } from '../../lib/userStore';
+import { useChatStore } from '../../lib/chatStore';
 
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-function mainPage() {
+function MainPage() {
   const [modal, setModal] = useState(false);
   const [groupModal, setGroupModal] = useState(false);
+  const [chats, setChats] = useState([]);
+  const [addMode, setAddMode] = useState(false);
+  const { currentUser } = useUserStore();
+  const { changeChat, chatId } = useChatStore();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
   const toggleModal = () => {
     setModal(!modal);
@@ -33,12 +39,6 @@ function mainPage() {
     handleClose();
   };
 
-  const [chats, setChats] = useState([]);
-  const [addMode, setAddMode] = useState(false);
-  const { currentUser } = useUserStore();
-  const { changeChat, chatId } = useChatStore();
-
-  // Fetch both personal and group chats
   useEffect(() => {
     const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res) => {
       const items = res.data().chats;
@@ -54,7 +54,15 @@ function mainPage() {
           const userDocRef = doc(db, "users", item.receiverId);
           const userDocSnap = getDoc(userDocRef);
           const user = (await userDocSnap).data();
-          return { ...item, user };
+          
+          // Obtener el gorrito activo del usuario
+          return {
+            ...item,
+            user: {
+              ...user,
+              activeHat: user?.activeHat || null, // Obtener el gorrito activo si existe
+            },
+          };
         }
       });
 
@@ -88,8 +96,6 @@ function mainPage() {
     }
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -127,38 +133,38 @@ function mainPage() {
           </div>
 
           <div className="list">
-              {/* Render chat list */}
-              {chats.map((chat) => (
-                <div onClick={() => handleSelect(chat)} key={chat.chatId}>
-                  {chat.isGroupChat ? (
+            {/* Render chat list */}
+            {chats.map((chat) => (
+              <div onClick={() => handleSelect(chat)} key={chat.chatId}>
+                {chat.isGroupChat ? (
+                  <ChatBox
+                    chatName={chat.groupName}
+                    lastMessage={chat.lastMessage}
+                    seen={chat.isSeen}
+                    time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    chatPicture={'/path-to-group-avatar.png'} // Default group avatar
+                  />
+                ) : (
+                  chat.user ? (
                     <ChatBox
-                      chatName={chat.groupName}
+                      chatName={chat.user.username}
                       lastMessage={chat.lastMessage}
                       seen={chat.isSeen}
                       time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      chatPicture={'/path-to-group-avatar.png'} // Default group avatar
+                      chatPicture={chat.user.avatar}
+                      activeHat={chat.user.activeCosmetic} // Pasar gorrito activo al componente ChatBox
                     />
                   ) : (
-                    chat.user ? (
-                      <ChatBox
-                        chatName={chat.user.username}
-                        lastMessage={chat.lastMessage}
-                        seen={chat.isSeen}
-                        time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        chatPicture={chat.user.avatar}
-                      />
-                    ) : (
-                      <div>No se pudo cargar la información del usuario</div>
-                    )
-                  )}
-                </div>
-              ))}
+                    <div>No se pudo cargar la información del usuario</div>
+                  )
+                )}
+              </div>
+            ))}
           </div>
-          
         </div>
 
         <div className="chat_space">
-        {chatId && <Chat chatId={chatId} />}
+          {chatId && <Chat chatId={chatId} />}
         </div>
       </div>
 
@@ -197,4 +203,4 @@ function mainPage() {
   );
 }
 
-export default mainPage;
+export default MainPage;
