@@ -205,8 +205,13 @@ const handleSend = async () => {
       const userRef = doc(db, "users", currentUser.id);
       await updateDoc(userRef, { points: newPoints });
     }
-
-    const userIDs = [currentUser.id, user.id];
+    var userIDs = []
+    if(chat?.isGroupChat){
+      userIDs = chat?.members;
+    }else{
+      userIDs = [currentUser.id, user.id];
+      
+    }
 
     userIDs.forEach(async (id) => {
       const userChatsRef = doc(db, "userchats", id);
