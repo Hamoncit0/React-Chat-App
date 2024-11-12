@@ -9,12 +9,15 @@
     width: 20%;
     border-right: 4px var(--color-primary) dashed;
 }
-.tiendita_nav a{
+.tiendita_nav button{
     padding: 20px;
     text-decoration: none;
+    border: none;
     border-bottom:  4px var(--color-primary) dashed;
+    background-color: transparent;
 }
-.tiendita_nav a:hover{
+.tiendita_nav button:hover{
+    cursor: pointer;
     background-color: var(--color-active-secondary);
 }
 .tiendita_main{

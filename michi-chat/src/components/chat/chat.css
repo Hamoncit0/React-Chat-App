@@ -2,6 +2,10 @@
     display: flex;
 }
 .tasks-container{
+    h1{
+        background-color: var(--color-primary);
+        padding: 10px;
+    }
     width: 50%;
     height: 100vh;
     border-left: dashed  var(--color-primary) 4px;
@@ -168,3 +172,14 @@
     z-index: 1000;
   }
   
+.settings{
+    h1{
+        background-color: var(--color-primary);
+        padding: 10px;
+    }
+    >span{
+        display: flex;
+        align-items: center;
+        border-bottom: var(--color-primary) dashed 4px;
+    }
+}

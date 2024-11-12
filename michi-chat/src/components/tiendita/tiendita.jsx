@@ -80,15 +80,15 @@ function Tiendita() {
   return (
     <div className='tiendita'>
       <div className="tiendita_nav">
-        <button onClick={() => setView('tienda')}><h3>Tiendita</h3></button>
-        <button onClick={() => setView('inventario')}><h3>Mis cosméticos</h3></button>
+        <button className='.tiendita_nav' onClick={() => setView('tienda')}><h3>Tiendita</h3></button>
+        <button className='.tiendita_nav' onClick={() => setView('inventario')}><h3>Mis cosméticos</h3></button>
       </div>
       <div className="tiendita_main">
         <h1>{view === 'tienda' ? "Tiendita" : "Mis cosméticos"}</h1>
         <div className="mis-monedas">
           <h2>Monedas: {points}</h2>
           <img src={monedita} alt="Monedas" />
-        </div>
+      </div>
         
         {view === 'tienda' ? (
           <div className="productos">

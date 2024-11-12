@@ -15,6 +15,7 @@ import { useUserStore } from '../../lib/userStore';
 import upload from "../../lib/upload";
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
+import Switch from '@mui/material/Switch';
 
 const socket = io('http://localhost:5000');
 
@@ -33,6 +34,7 @@ function Chat() {
   const [lastMessageTime, setLastMessageTime] = useState(null); // Tiempo del último mensaje enviado
   const [openTask, setOpenTask] = useState(false);
   const [openSettings, setOpenSettings] = useState(false)
+  const [encryption, setEncryption] = useState(false)
   // Actualiza el estado de tareas cuando cambie el chat
   useEffect(() => {
     if (chat?.tasks) {
@@ -80,6 +82,7 @@ function Chat() {
 
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
       setChat(res.data());
+      setEncryption(res.data()?.encryption || false);
     });
 
     return () => {
@@ -236,6 +239,20 @@ const handleDeleteTask = async (index) => {
 
 const toggleTaskBar = () => {
   setOpenTask(prev => !prev);
+  setOpenSettings(false)
+};
+const toggleSettings = () => {
+  setOpenSettings(prev => !prev);
+  setOpenTask(false)
+};
+
+
+const toggleEncryption = async () => {
+  setEncryption((prev) => !prev);
+  
+  // Actualiza en Firebase el estado de encriptación
+  const chatRef = doc(db, "chats", chatId);
+  await updateDoc(chatRef, { encryption: !encryption });
 };
 
   return (
@@ -251,7 +268,7 @@ const toggleTaskBar = () => {
           <h2>{user.username}</h2>
           <div className="chat_options">
             <button onClick={startVideoCall}><VideocamIcon /></button>
-            <button><InfoIcon /></button>
+            <button onClick={toggleSettings}><InfoIcon /></button>
           </div>
         </div>
         <div className="chat_content" ref={scrollRef}>
@@ -293,31 +310,20 @@ const toggleTaskBar = () => {
           <button className="btn" onClick={handleSend}>Enviar <SendIcon /></button>
         </div> 
       </div>
-     { openSettings &&  <div className="tasks-container">
-          <div className="tasks">
-            {tasks.map((task, index) => (
-              <div key={index} className="task">
-                <input
-                  type="checkbox"
-                  checked={task.completed || false}
-                  onChange={() => handleToggleTaskCompletion(index)}
-                />
-                <span>{task.task}</span>
-                <button className='btn' onClick={() => handleDeleteTask(index)}>Delete</button>
-              </div>
-            ))}
-          </div>
-          <div className="chat_bar">
-            <input
-              type="text"
-              placeholder='Escribe Aqui'
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
-            />
-            <button className="btn" onClick={handleSendTask}>Enviar <SendIcon /></button>
+     { openSettings &&  <div className="tasks-container chat-settings">
+          <div className="settings">
+            <h1>Ajustes del chat</h1>
+            <span>
+              <p>Encriptacion de mensajes: </p><Switch
+              color="primary"
+              checked={encryption} // Vincula el estado del switch con el tema oscuro
+              onChange={toggleEncryption} // Maneja el cambio del switch
+              />
+            </span>
           </div>
         </div>}
-     { openTask &&  <div className="tasks-container chat-settings">
+     { openTask &&  <div className="tasks-container">
+          <h1>Tareas</h1>
           <div className="tasks">
             {tasks.map((task, index) => (
               <div key={index} className="task">
