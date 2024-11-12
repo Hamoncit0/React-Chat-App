@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
-import './chat.css'
+import React, { useState, useEffect, useRef } from 'react';
+import './chat.css';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import CallIcon from '@mui/icons-material/Call';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
-import { useRef, useEffect } from 'react';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import SentMessage from '../sent-message/sentMessage';
 import ReceivedMessage from '../received-message/receivedMessage';
@@ -18,18 +17,17 @@ import io from 'socket.io-client';
 
 const socket = io('http://localhost:5000');
 
-function chat() {
-  const navigate = useNavigate(); // Hook para navegar a la ruta de la llamada
+function Chat() {
+  const navigate = useNavigate();
   const [text, setText] = useState("");
   const [chat, setChat] = useState();
   const scrollRef = useRef(null);
-  const {chatId, user} = useChatStore();
-  const {currentUser} = useUserStore();
-  const [img, setImg] = useState({
-    file: null,
-    url: "",
-  });
+  const { chatId, user } = useChatStore();
+  const { currentUser } = useUserStore();
+  const [img, setImg] = useState({ file: null, url: "" });
   const [incomingCall, setIncomingCall] = useState(null);
+  const [points, setPoints] = useState(0); // Estado para almacenar los puntos
+  const [lastMessageTime, setLastMessageTime] = useState(null); // Tiempo del último mensaje enviado
 
   useEffect(() => {
     // Envía el userId al servidor al conectarse
@@ -39,7 +37,6 @@ function chat() {
       setIncomingCall({ callerId, roomId });
     });
 
-    // Limpia el socket al desmontar el componente
     return () => {
       socket.off('incoming-call');
     };
@@ -48,8 +45,8 @@ function chat() {
   const startVideoCall = () => {
     socket.emit('call-user', {
       callerId: currentUser.id,
-      receiverId: user.id, // ID del destinatario desde el contexto de chat o la sesión actual
-      roomId: user.id, // Usa el ID del destinatario como roomId
+      receiverId: user.id,
+      roomId: user.id,
     });
     navigate(`/call/${user.id}`);
   };
@@ -60,7 +57,7 @@ function chat() {
       setIncomingCall(null);
     }
   };
-  // Desplázate al final del div cuando el componente se renderice o el contenido cambie
+
   useEffect(() => {
     if (chat?.messages) {
       scrollToBottom();
@@ -68,18 +65,17 @@ function chat() {
   }, [chat?.messages]);
 
   useEffect(() => {
-    if (!chatId) return; // Asegúrate de que chatId esté definido
-  
+    if (!chatId) return;
+
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
       setChat(res.data());
     });
-  
+
     return () => {
       unSub();
     };
   }, [chatId]);
-  
-  // Función para desplazar el scroll al final del div
+
   const scrollToBottom = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -94,123 +90,104 @@ function chat() {
       });
     }
   };
- 
-  const handleSend = async () => {
-    if (text === "" && img.url === "") return;
+ // Cargar puntos iniciales desde Firebase
+ useEffect(() => {
+    const loadPoints = async () => {
+      const userRef = doc(db, "users", currentUser.id);
+      const userDoc = await getDoc(userRef);
+      setPoints(userDoc.data()?.points || 0);
+    };
+    loadPoints();
+  }, [currentUser.id]);
 
-    let imgUrl = null;
+const handleSend = async () => {
+  if (text === "") return;
 
-    try {
-      if (img.file) {
-        imgUrl = await upload(img.file);
-      }
-
-      await updateDoc(doc(db, "chats", chatId), {
-        messages: arrayUnion({
-          senderId: currentUser.id,
-          text,
-          createdAt: new Date(),
-          ...(imgUrl && { img: imgUrl }),
-        }),
-      });
-
-      const userIDs = [currentUser.id, user.id];
-
-      userIDs.forEach(async (id) => {
-        const userChatsRef = doc(db, "userchats", id);
-        const userChatsSnapshot = await getDoc(userChatsRef);
-
-        if (userChatsSnapshot.exists()) {
-          const userChatsData = userChatsSnapshot.data();
-
-          const chatIndex = userChatsData.chats.findIndex(
-            (c) => c.chatId === chatId
-          );
-
-          userChatsData.chats[chatIndex].lastMessage = text;
-          userChatsData.chats[chatIndex].isSeen =
-            id === currentUser.id ? true : false;
-          userChatsData.chats[chatIndex].updatedAt = Date.now();
-
-          await updateDoc(userChatsRef, {
-            chats: userChatsData.chats,
-          });
-        }
-      });
-    } catch (err) {
-      console.log(err);
-    } finally{
-    setImg({
-      file: null,
-      url: "",
+  try {
+    // Envía el mensaje a Firebase
+    await updateDoc(doc(db, "chats", chatId), {
+      messages: arrayUnion({
+        senderId: currentUser.id,
+        text,
+        createdAt: new Date(),
+      }),
     });
 
-    setText("");
+    const now = new Date();
+    if (!lastMessageTime || (now - lastMessageTime) >= 60000) {
+      // Incrementar puntos y actualizarlos en Firebase
+      const newPoints = points + 30;
+      setPoints(newPoints);
+      setLastMessageTime(now)
+      const userRef = doc(db, "users", currentUser.id);
+      await updateDoc(userRef, { points: newPoints });
     }
-  };
+
+
+  } catch (err) {
+    console.error("Error enviando mensaje o actualizando puntos", err);
+  }
+
+  setText("");
+};
+
+
   return (
     <div className='chat'>
-       {/* Mostrar alerta de llamada entrante si hay una */}
-       {incomingCall && (
+      {incomingCall && (
         <div className="call-notification">
           <p>Incoming call from {incomingCall.callerId}</p>
           <button onClick={acceptCall}>Accept Call</button>
         </div>
       )}
-      {/* Resto del código del chat */}
       <div className="chat_name">
         <h2>{user.username}</h2>
         <div className="chat_options">
-          <button onClick={startVideoCall}><VideocamIcon></VideocamIcon></button>
-          <button><CallIcon></CallIcon></button>
+          <button onClick={startVideoCall}><VideocamIcon /></button>
+          <button><CallIcon /></button>
         </div>
       </div>
-      
-      <div className="chat_content" ref={scrollRef} >
+      <div className="chat_content" ref={scrollRef}>
         {chat?.messages?.map((message) => (
           <div key={message?.createdAt}>
-            {message.senderId === currentUser.id ?(
-              
-            <SentMessage 
-              msgImg={message.img} 
-              msgText={message.text} 
-              msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
-              userImg={currentUser.avatar} />
-            ):(
-              
-            <ReceivedMessage 
-              msgImg={message.img} 
-              msgText={message.text} 
-              msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
-              userImg={user.avatar} />
-            )
-
-            }
+            {message.senderId === currentUser.id ? (
+              <SentMessage
+                msgImg={message.img}
+                msgText={message.text}
+                msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                userImg={currentUser.avatar}
+              />
+            ) : (
+              <ReceivedMessage
+                msgImg={message.img}
+                msgText={message.text}
+                msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                userImg={user.avatar}
+              />
+            )}
           </div>
-          
-        ))
-
-        }
+        ))}
       </div>
-      {img.url && 
-      <div className="img-preview">
-        <p>Img preview:</p>
-         <img src={img.url} alt=""/>
-      </div>}
-      <div className="chat_bar" >
+      {img.url && (
+        <div className="img-preview">
+          <p>Img preview:</p>
+          <img src={img.url} alt="" />
+        </div>
+      )}
+      <div className="chat_bar">
         <div className="chat_options">
           <input type="file" name="file-upload" id="file-upload" onChange={handleImg} />
-          <label htmlFor="file-upload"><AttachFileIcon></AttachFileIcon></label>
-          <button><AddTaskIcon></AddTaskIcon></button>
+          <label htmlFor="file-upload"><AttachFileIcon /></label>
+          <button><AddTaskIcon /></button>
         </div>
         <input type="text" placeholder='Escribe Aqui'
           value={text}
           onChange={(e) => setText(e.target.value)} />
-          <button className="btn" onClick={handleSend}>Enviar <SendIcon></SendIcon></button>
+        <button className="btn" onClick={handleSend}>Enviar <SendIcon /></button>
       </div>
-
+      <div className="points-display">Puntos: {points}</div> {/* Mostrando los puntos */}
     </div>
-  )
+  );
 }
 
-export default chat
+export default Chat;

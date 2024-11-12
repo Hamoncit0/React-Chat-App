@@ -93,6 +93,7 @@ function Signup({ isOpen, closeModal, children }) {
         firstName,
         lastName,
         blocked: [],
+        points: 0
       });
 
       await setDoc(doc(db, "userchats", res.user.uid), {
