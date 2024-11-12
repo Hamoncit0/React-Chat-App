@@ -33,7 +33,33 @@ function MainPage() {
   const open = Boolean(anchorEl);
   const [incomingCall, setIncomingCall] = useState(null);
   const navigate = useNavigate();
+  const [filteredChats, setFilteredChats] = useState([]); // Estado para los chats filtrados
+  const [searchTerm, setSearchTerm] = useState(''); 
 
+
+// Función para manejar el cambio en el campo de búsqueda
+const handleSearchChange = (event) => {
+  const value = event.target.value;
+  setSearchTerm(value);
+
+  if (value === '') {
+    // Si el campo de búsqueda está vacío, muestra todos los chats
+    setFilteredChats(chats);
+  } else {
+    // Filtra los chats por nombre de usuario o de grupo según el término de búsqueda
+    const filtered = chats.filter((chat) =>
+      chat.isGroupChat
+        ? chat.groupName.toLowerCase().includes(value.toLowerCase())
+        : chat.user?.username.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredChats(filtered);
+  }
+};
+
+useEffect(() => {
+    // Cuando se actualicen los chats, también se actualizan los chats filtrados
+    setFilteredChats(chats);
+  }, [chats]);
 
   useEffect(() => {
     // Envía el userId al servidor al conectarse
@@ -162,6 +188,8 @@ function MainPage() {
               <AddToPhotosIcon sx={{ fontSize: 40 }} />
             </button>
             <TextField
+            value={searchTerm}
+             onChange={handleSearchChange}
               placeholder="Search..."
               className="custom-input"
               InputProps={{
@@ -177,7 +205,7 @@ function MainPage() {
 
           <div className="list">
             {/* Render chat list */}
-            {chats.map((chat) => (
+            {filteredChats.map((chat) => (
               <div onClick={() => handleSelect(chat)} key={chat.chatId}>
                 {chat.isGroupChat ? (
                   <ChatBox
@@ -185,7 +213,7 @@ function MainPage() {
                     lastMessage={chat.lastMessage}
                     seen={chat.isSeen}
                     time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    chatPicture={chat.groupImage || '/path-to-group-avatar.png'} // Default group avatar
+                    chatPicture={chat.groupImage || '/path-to-group-avatar.png'}
                   />
                 ) : (
                   chat.user ? (
@@ -195,7 +223,7 @@ function MainPage() {
                       seen={chat.isSeen}
                       time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       chatPicture={chat.user.avatar}
-                      activeHat={chat.user.activeCosmetic} // Pasar gorrito activo al componente ChatBox
+                      activeHat={chat.user.activeCosmetic}
                     />
                   ) : (
                     <div>No se pudo cargar la información del usuario</div>
