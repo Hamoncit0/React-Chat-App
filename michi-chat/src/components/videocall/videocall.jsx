@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 const socket = io('http://localhost:5000'); // Conectar al servidor backend
+import './videocall.css'
 
 const VideoCall = () => {
   const { roomId } = useParams();
@@ -88,14 +89,20 @@ const VideoCall = () => {
   };
 
   return (
-    <div>
-      <div>
+    <div className='videoCall'>
+      <div className="my-video">
+        <img className='logov' src="/src/assets/logo_medium.png" alt="" />
+        <img className='gato-sentado' src="/src/assets/gato_sentado.png" alt="" />
         <video ref={localVideoRef} autoPlay muted playsInline style={{ width: '400px' }} />
-        <video ref={remoteVideoRef} autoPlay playsInline style={{ width: '400px' }} />
+        <img className='huellas' src="/src/assets/huellas.png" alt='' />
       </div>
+      <div className="remote-video">
+        <video ref={remoteVideoRef} autoPlay playsInline  />
+        
       <button onClick={hangUp} style={{ marginTop: '10px', padding: '10px 20px', backgroundColor: 'red', color: 'white', border: 'none', borderRadius: '5px' }}>
         Colgar
       </button>
+      </div>
     </div>
   );
 };
