@@ -12,6 +12,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    overflow: scroll;
 }
 .new-chat-search{
     position: sticky;
@@ -104,4 +105,29 @@
 .items{
     display: flex;
     overflow-x: scroll;
+}
+.newChatFieldInput{
+    width: 100%;
+    padding: 10px;
+    margin: 10px;
+    font-size: 2vw;
+    border: 0.3vw dashed  var(--color-primary);
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #F7F7F7;
+}
+
+.uploadImgGroup{
+    display: none;
+}
+.selectImgGroup{
+    width: fit-content;
+    padding: 20px;
+    margin: 2rem !important;
+}
+.img-previewGroup{
+    img{
+        width: 200px;
+        height: 200px;
+    }
 }

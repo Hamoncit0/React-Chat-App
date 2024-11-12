@@ -42,38 +42,43 @@ function MainPage() {
   useEffect(() => {
     const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res) => {
       const items = res.data().chats;
-
+  
       const promises = items.map(async (item) => {
         if (item.isGroupChat) {
+          // Recuperar el documento del chat grupal desde Firebase
+          const groupChatDoc = await getDoc(doc(db, 'chats', item.chatId));
+          const groupChatData = groupChatDoc.data();
+          
           return {
             ...item,
-            groupName: item.groupName || 'Chat grupal',
-            groupMembers: item.members || [],
+            groupName: groupChatData.groupName || 'Chat grupal', // Usar el nombre del grupo o un valor por defecto
+            groupMembers: groupChatData.members || [],
+            groupImage: groupChatData.groupImage || ''
           };
         } else {
           const userDocRef = doc(db, "users", item.receiverId);
           const userDocSnap = getDoc(userDocRef);
           const user = (await userDocSnap).data();
           
-          // Obtener el gorrito activo del usuario
           return {
             ...item,
             user: {
               ...user,
-              activeHat: user?.activeHat || null, // Obtener el gorrito activo si existe
+              activeHat: user?.activeHat || null,
             },
           };
         }
       });
-
+  
       const chatData = await Promise.all(promises);
       setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
     });
-
+  
     return () => {
       unSub();
     };
   }, [currentUser.id]);
+  
 
   const handleSelect = async (chat) => {
     const chatIndex = chats.findIndex((item) => item.chatId === chat.chatId);
@@ -142,7 +147,7 @@ function MainPage() {
                     lastMessage={chat.lastMessage}
                     seen={chat.isSeen}
                     time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    chatPicture={'/path-to-group-avatar.png'} // Default group avatar
+                    chatPicture={chat.groupImage || '/path-to-group-avatar.png'} // Default group avatar
                   />
                 ) : (
                   chat.user ? (

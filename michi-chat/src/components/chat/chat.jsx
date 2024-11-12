@@ -39,6 +39,20 @@ function Chat() {
   const [openTask, setOpenTask] = useState(false);
   const [openSettings, setOpenSettings] = useState(false)
   const [encryption, setEncryption] = useState(false)
+  const [userProfiles, setUserProfiles] = useState({}); // Función para obtener el perfil del usuario por ID
+
+  const fetchUserProfile = async (userId) => {
+    if (!userProfiles[userId]) { // Solo buscar si no está en el estado
+      const userRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        setUserProfiles((prev) => ({
+          ...prev,
+          [userId]: userDoc.data(),
+        }));
+      }
+    }
+  };
 
   const secretKey = import.meta.env.VITE_SECRET_KEY;
 
@@ -104,6 +118,12 @@ function Chat() {
 
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
       setChat(res.data());
+      
+      // Obtener la foto de perfil de cada usuario en los mensajes
+      res.data().messages.forEach((message) => {
+        fetchUserProfile(message.senderId);
+      });
+
       setEncryption(res.data()?.encryption || false);
     });
 
@@ -290,9 +310,10 @@ const toggleEncryption = async () => {
           </div>
         )}
         <div className="chat_name">
-          <h2>{user.username}</h2>
+          <h2>{user.username || chat?.groupName}</h2>
           <div className="chat_options">
-            <button onClick={startVideoCall}><VideocamIcon /></button>
+            {!chat?.isGroupChat &&
+            <button onClick={startVideoCall}><VideocamIcon /></button>}
             <button onClick={toggleSettings}><InfoIcon /></button>
           </div>
         </div>
@@ -311,7 +332,7 @@ const toggleEncryption = async () => {
                   msgImg={message.img}
                   msgText={message.encrypted ? decryptMessage(message.text) : message.text}
                   msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  userImg={user.avatar}
+                  userImg={userProfiles[message.senderId]?.avatar}
                 />
               )}
             </div>

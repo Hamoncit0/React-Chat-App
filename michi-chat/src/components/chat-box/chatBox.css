@@ -4,7 +4,8 @@
     margin-bottom: 10px;
     overflow: hidden;
     white-space: nowrap;
-    padding-top: 15px;
+    padding-top: 20px;
+    position: relative;
 }
 .chat-box-pfp span{
     color: gray;
@@ -17,11 +18,12 @@
     border-radius: 50%;
     margin-left: 10px;
 }
-.activeHat{
+
+.activeHat {
     z-index: 1000;
     height: 40px;
     width: 40px;
-    top: -25px;
-    left: 50px;
-    position: relative;
+    top: 0px;
+    left: 10px;
+    position: absolute;
 }
