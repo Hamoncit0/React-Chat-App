@@ -15,9 +15,12 @@ import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useUserStore } from '../../lib/userStore';
 import { useChatStore } from '../../lib/chatStore';
-
+import { useNavigate } from 'react-router-dom';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 function MainPage() {
   const [modal, setModal] = useState(false);
@@ -28,6 +31,35 @@ function MainPage() {
   const { changeChat, chatId } = useChatStore();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const [incomingCall, setIncomingCall] = useState(null);
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    // Envía el userId al servidor al conectarse
+    socket.emit('register-user', currentUser.id);
+
+    socket.on('incoming-call', async({ callerId, roomId }) => {
+      // Obtén el nombre del usuario desde Firebase
+      const userDoc = await getDoc(doc(db, "users", callerId));
+      const callerName = userDoc.exists() ? userDoc.data().username : 'Unknown Caller';
+      
+      setIncomingCall({ callerId, roomId, callerName });
+    });
+
+    return () => {
+      socket.off('incoming-call');
+    };
+  }, [currentUser.id]);
+
+
+  const acceptCall = () => {
+    if (incomingCall) {
+      navigate(`/call/${incomingCall.roomId}/${incomingCall.callerName}/${currentUser.username}`);
+      setIncomingCall(null);
+    }
+  };
+
 
   const toggleModal = () => {
     setModal(!modal);
@@ -111,6 +143,12 @@ function MainPage() {
   return (
     <div className='mainpage'>
       <Header />
+      {incomingCall && (
+          <div className="call-notification">
+            <p>Incoming call from {incomingCall.callerName}</p>
+            <button className='btn' onClick={acceptCall}>Accept Call</button>
+          </div>
+        )}
       <div className={`login ${modal || groupModal ? 'blur-background' : ''} main`}>
         <div className="chat_list">
           <div className="search">

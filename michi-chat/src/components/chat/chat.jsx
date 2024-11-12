@@ -82,13 +82,6 @@ function Chat() {
     // Envía el userId al servidor al conectarse
     socket.emit('register-user', currentUser.id);
 
-    socket.on('incoming-call', ({ callerId, roomId }) => {
-      setIncomingCall({ callerId, roomId });
-    });
-
-    return () => {
-      socket.off('incoming-call');
-    };
   }, [currentUser.id]);
 
   const startVideoCall = () => {
@@ -97,15 +90,9 @@ function Chat() {
       receiverId: user.id,
       roomId: user.id,
     });
-    navigate(`/call/${user.id}`);
+    navigate(`/call/${user.id}/${user.username}/${currentUser.username}`);
   };
 
-  const acceptCall = () => {
-    if (incomingCall) {
-      navigate(`/call/${incomingCall.roomId}`);
-      setIncomingCall(null);
-    }
-  };
 
   useEffect(() => {
     if (chat?.messages) {
@@ -308,12 +295,7 @@ const toggleEncryption = async () => {
   return (
     <div className="chat-super">
       <div className='chat'>
-        {incomingCall && (
-          <div className="call-notification">
-            <p>Incoming call from {incomingCall.callerId}</p>
-            <button onClick={acceptCall}>Accept Call</button>
-          </div>
-        )}
+       
         <div className="chat_name">
           <h2>{user.username || chat?.groupName}</h2>
           <div className="chat_options">

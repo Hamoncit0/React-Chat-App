@@ -6,7 +6,7 @@ const socket = io('http://localhost:5000'); // Conectar al servidor backend
 import './videocall.css'
 
 const VideoCall = () => {
-  const { roomId } = useParams();
+  const { roomId, username, me } = useParams();
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const [roomIdOG, setRoomId] = useState(roomId);
@@ -93,12 +93,15 @@ const VideoCall = () => {
       <div className="my-video">
         <img className='logov' src="/src/assets/logo_medium.png" alt="" />
         <img className='gato-sentado' src="/src/assets/gato_sentado.png" alt="" />
-        <video ref={localVideoRef} autoPlay muted playsInline style={{ width: '400px' }} />
+        <div className="video-and-name">
+          <video ref={localVideoRef} autoPlay muted playsInline style={{ width: '400px' }} />
+          <p>{me}</p>
+        </div>
         <img className='huellas' src="/src/assets/huellas.png" alt='' />
       </div>
       <div className="remote-video">
         <video ref={remoteVideoRef} autoPlay playsInline  />
-        
+        <p>{username}</p>
       <button onClick={hangUp} style={{ marginTop: '10px', padding: '10px 20px', backgroundColor: 'red', color: 'white', border: 'none', borderRadius: '5px' }}>
         Colgar
       </button>

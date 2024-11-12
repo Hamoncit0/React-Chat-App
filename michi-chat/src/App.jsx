@@ -60,7 +60,7 @@ function App() {
       <Routes>
         <Route path="/" element={currentUser ? <Navigate to="/main" /> : <Login />} />
         <Route path="/main" element={currentUser ? <MainPage /> : <Navigate to="/" />} />
-        <Route path="/call/:roomId" element={currentUser ? <Videocall /> : <Navigate to="/" />} />
+        <Route path="/call/:roomId/:username/:me" element={currentUser ? <Videocall /> : <Navigate to="/" />} />
         <Route path="/tiendita" element={currentUser ? 
           <>
             <Header />
