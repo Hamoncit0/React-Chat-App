@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './chat.css';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import CallIcon from '@mui/icons-material/Call';
+import InfoIcon from '@mui/icons-material/Info';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import AddTaskIcon from '@mui/icons-material/AddTask';
@@ -19,6 +20,8 @@ const socket = io('http://localhost:5000');
 
 function Chat() {
   const navigate = useNavigate();
+  const [task, setTask] = useState("");//el texto del input para mandar tasks
+  const [tasks, setTasks] = useState([]); //el array de tasks
   const [text, setText] = useState("");
   const [chat, setChat] = useState();
   const scrollRef = useRef(null);
@@ -28,6 +31,14 @@ function Chat() {
   const [incomingCall, setIncomingCall] = useState(null);
   const [points, setPoints] = useState(0); // Estado para almacenar los puntos
   const [lastMessageTime, setLastMessageTime] = useState(null); // Tiempo del último mensaje enviado
+  const [openTask, setOpenTask] = useState(false);
+  const [openSettings, setOpenSettings] = useState(false)
+  // Actualiza el estado de tareas cuando cambie el chat
+  useEffect(() => {
+    if (chat?.tasks) {
+      setTasks(chat.tasks);
+    }
+  }, [chat]);
 
   useEffect(() => {
     // Envía el userId al servidor al conectarse
@@ -100,16 +111,40 @@ function Chat() {
     loadPoints();
   }, [currentUser.id]);
 
+  useEffect(() => {
+    const loadLastMessageTime = async () => {
+      if (!chatId) return;
+  
+      const chatDoc = await getDoc(doc(db, "chats", chatId));
+      if (chatDoc.exists()) {
+        const messages = chatDoc.data().messages;
+        const lastMessage = messages[messages.length - 1];
+        
+        if (lastMessage && lastMessage.createdAt) {
+          setLastMessageTime(lastMessage.createdAt.toDate());
+        }
+      }
+    };
+  
+    loadLastMessageTime();
+  }, [chatId]);
+
 const handleSend = async () => {
-  if (text === "") return;
+  if (text === "" && img.url === "") return;
+
+  let imgUrl = null;
 
   try {
-    // Envía el mensaje a Firebase
+    if (img.file) {
+      imgUrl = await upload(img.file);
+    }
+
     await updateDoc(doc(db, "chats", chatId), {
       messages: arrayUnion({
         senderId: currentUser.id,
         text,
         createdAt: new Date(),
+        ...(imgUrl && { img: imgUrl }),
       }),
     });
 
@@ -123,69 +158,189 @@ const handleSend = async () => {
       await updateDoc(userRef, { points: newPoints });
     }
 
+    const userIDs = [currentUser.id, user.id];
 
+    userIDs.forEach(async (id) => {
+      const userChatsRef = doc(db, "userchats", id);
+      const userChatsSnapshot = await getDoc(userChatsRef);
+
+      if (userChatsSnapshot.exists()) {
+        const userChatsData = userChatsSnapshot.data();
+
+        const chatIndex = userChatsData.chats.findIndex(
+          (c) => c.chatId === chatId
+        );
+
+        userChatsData.chats[chatIndex].lastMessage = text;
+        userChatsData.chats[chatIndex].isSeen =
+          id === currentUser.id ? true : false;
+        userChatsData.chats[chatIndex].updatedAt = Date.now();
+
+        await updateDoc(userChatsRef, {
+          chats: userChatsData.chats,
+        });
+      }
+    });
   } catch (err) {
-    console.error("Error enviando mensaje o actualizando puntos", err);
-  }
+    console.log(err);
+  } finally{
+  setImg({
+    file: null,
+    url: "",
+  });
 
   setText("");
+  }
 };
 
+const handleSendTask = async () => {
+  if (task === "") return;
+
+  try {
+    // Envía el mensaje a Firebase
+    await updateDoc(doc(db, "chats", chatId), {
+      tasks: arrayUnion({
+        task
+      }),
+    });
+
+
+  } catch (err) {
+    console.error("Error enviando tarea", err);
+  }
+
+  setTask("");
+};
+// Marcar como completada
+const handleToggleTaskCompletion = async (index) => {
+  const updatedTasks = [...tasks];
+  updatedTasks[index].completed = !updatedTasks[index].completed;
+
+  try {
+    await updateDoc(doc(db, "chats", chatId), { tasks: updatedTasks });
+  } catch (err) {
+    console.error("Error actualizando tarea", err);
+  }
+};
+
+// Eliminar tarea
+const handleDeleteTask = async (index) => {
+  const updatedTasks = tasks.filter((_, i) => i !== index);
+
+  try {
+    await updateDoc(doc(db, "chats", chatId), { tasks: updatedTasks });
+  } catch (err) {
+    console.error("Error eliminando tarea", err);
+  }
+};
+
+const toggleTaskBar = () => {
+  setOpenTask(prev => !prev);
+};
 
   return (
-    <div className='chat'>
-      {incomingCall && (
-        <div className="call-notification">
-          <p>Incoming call from {incomingCall.callerId}</p>
-          <button onClick={acceptCall}>Accept Call</button>
-        </div>
-      )}
-      <div className="chat_name">
-        <h2>{user.username}</h2>
-        <div className="chat_options">
-          <button onClick={startVideoCall}><VideocamIcon /></button>
-          <button><CallIcon /></button>
-        </div>
-      </div>
-      <div className="chat_content" ref={scrollRef}>
-        {chat?.messages?.map((message) => (
-          <div key={message?.createdAt}>
-            {message.senderId === currentUser.id ? (
-              <SentMessage
-                msgImg={message.img}
-                msgText={message.text}
-                msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                userImg={currentUser.avatar}
-              />
-            ) : (
-              <ReceivedMessage
-                msgImg={message.img}
-                msgText={message.text}
-                msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                userImg={user.avatar}
-              />
-            )}
+    <div className="chat-super">
+      <div className='chat'>
+        {incomingCall && (
+          <div className="call-notification">
+            <p>Incoming call from {incomingCall.callerId}</p>
+            <button onClick={acceptCall}>Accept Call</button>
           </div>
-        ))}
-      </div>
-      {img.url && (
-        <div className="img-preview">
-          <p>Img preview:</p>
-          <img src={img.url} alt="" />
+        )}
+        <div className="chat_name">
+          <h2>{user.username}</h2>
+          <div className="chat_options">
+            <button onClick={startVideoCall}><VideocamIcon /></button>
+            <button><InfoIcon /></button>
+          </div>
         </div>
-      )}
-      <div className="chat_bar">
-        <div className="chat_options">
-          <input type="file" name="file-upload" id="file-upload" onChange={handleImg} />
-          <label htmlFor="file-upload"><AttachFileIcon /></label>
-          <button><AddTaskIcon /></button>
+        <div className="chat_content" ref={scrollRef}>
+          {chat?.messages?.map((message) => (
+            <div key={message?.createdAt}>
+              {message.senderId === currentUser.id ? (
+                <SentMessage
+                  msgImg={message.img}
+                  msgText={message.text}
+                  msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  userImg={currentUser.avatar}
+                />
+              ) : (
+                <ReceivedMessage
+                  msgImg={message.img}
+                  msgText={message.text}
+                  msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  userImg={user.avatar}
+                />
+              )}
+            </div>
+          ))}
         </div>
-        <input type="text" placeholder='Escribe Aqui'
-          value={text}
-          onChange={(e) => setText(e.target.value)} />
-        <button className="btn" onClick={handleSend}>Enviar <SendIcon /></button>
+        {img.url && (
+          <div className="img-preview">
+            <p>Img preview:</p>
+            <img src={img.url} alt="" />
+          </div>
+        )}
+        <div className="chat_bar">
+          <div className="chat_options">
+            <input type="file" name="file-upload" id="file-upload" onChange={handleImg} />
+            <label htmlFor="file-upload"><AttachFileIcon /></label>
+            <button onClick={toggleTaskBar}><AddTaskIcon /></button>
+          </div>
+          <input type="text" placeholder='Escribe Aqui'
+            value={text}
+            onChange={(e) => setText(e.target.value)} />
+          <button className="btn" onClick={handleSend}>Enviar <SendIcon /></button>
+        </div> 
       </div>
-      <div className="points-display">Puntos: {points}</div> {/* Mostrando los puntos */}
+     { openSettings &&  <div className="tasks-container">
+          <div className="tasks">
+            {tasks.map((task, index) => (
+              <div key={index} className="task">
+                <input
+                  type="checkbox"
+                  checked={task.completed || false}
+                  onChange={() => handleToggleTaskCompletion(index)}
+                />
+                <span>{task.task}</span>
+                <button className='btn' onClick={() => handleDeleteTask(index)}>Delete</button>
+              </div>
+            ))}
+          </div>
+          <div className="chat_bar">
+            <input
+              type="text"
+              placeholder='Escribe Aqui'
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+            />
+            <button className="btn" onClick={handleSendTask}>Enviar <SendIcon /></button>
+          </div>
+        </div>}
+     { openTask &&  <div className="tasks-container chat-settings">
+          <div className="tasks">
+            {tasks.map((task, index) => (
+              <div key={index} className="task">
+                <input
+                  type="checkbox"
+                  checked={task.completed || false}
+                  onChange={() => handleToggleTaskCompletion(index)}
+                />
+                <span>{task.task}</span>
+                <button className='btn' onClick={() => handleDeleteTask(index)}>Delete</button>
+              </div>
+            ))}
+          </div>
+          <div className="chat_bar">
+            <input
+              type="text"
+              placeholder='Escribe Aqui'
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+            />
+            <button className="btn" onClick={handleSendTask}>Enviar <SendIcon /></button>
+          </div>
+        </div>}
     </div>
   );
 }

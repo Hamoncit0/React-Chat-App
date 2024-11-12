@@ -1,3 +1,27 @@
+.chat-super{
+    display: flex;
+}
+.tasks-container{
+    width: 50%;
+    height: 100vh;
+    border-left: dashed  var(--color-primary) 4px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+.tasks{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Permite que este contenedor crezca y ocupe el espacio disponible */
+    overflow-y: scroll; /* Habilita el scroll vertical si el contenido excede la altura */
+    
+    .task{
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-bottom: dashed var(--color-primary) 4px;
+    }
+}
 .chat{
     background-color: var(--color-secondary);
     height: 100%;
@@ -17,7 +41,7 @@
     overflow-y: auto; /* Habilita el scroll vertical si el contenido excede la altura */
     padding: 10px;
     margin-bottom: 80px;
-    height: 100vh;
+    height: 65vh;
 }
 .msg{
     display: flex;
