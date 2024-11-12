@@ -1,21 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './chat.css';
 import VideocamIcon from '@mui/icons-material/Videocam';
-import CallIcon from '@mui/icons-material/Call';
 import InfoIcon from '@mui/icons-material/Info';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import Switch from '@mui/material/Switch';
+import './chat.css';
+
 import SentMessage from '../sent-message/sentMessage';
 import ReceivedMessage from '../received-message/receivedMessage';
+
 import { useChatStore } from '../../lib/chatStore';
 import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useUserStore } from '../../lib/userStore';
 import upload from "../../lib/upload";
 import { useNavigate } from 'react-router-dom';
+
+import CryptoJS from 'crypto-js'
+
 import io from 'socket.io-client';
-import Switch from '@mui/material/Switch';
 
 const socket = io('http://localhost:5000');
 
@@ -35,6 +39,24 @@ function Chat() {
   const [openTask, setOpenTask] = useState(false);
   const [openSettings, setOpenSettings] = useState(false)
   const [encryption, setEncryption] = useState(false)
+
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+
+
+  const encryptMessage = (message) => {
+    return CryptoJS.AES.encrypt(message, secretKey).toString();
+  };
+  
+  const decryptMessage = (cipherText) => {
+    try {
+      const bytes = CryptoJS.AES.decrypt(cipherText, secretKey);
+      return bytes.toString(CryptoJS.enc.Utf8);
+    } catch (error) {
+      console.error("Error al desencriptar el mensaje", error);
+      return cipherText;
+    }
+  };
+
   // Actualiza el estado de tareas cuando cambie el chat
   useEffect(() => {
     if (chat?.tasks) {
@@ -91,6 +113,7 @@ function Chat() {
   }, [chatId]);
 
   const scrollToBottom = () => {
+    console.log(secretKey)
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
@@ -136,6 +159,7 @@ const handleSend = async () => {
   if (text === "" && img.url === "") return;
 
   let imgUrl = null;
+  let messageText = encryption ? encryptMessage(text) : text;
 
   try {
     if (img.file) {
@@ -145,7 +169,8 @@ const handleSend = async () => {
     await updateDoc(doc(db, "chats", chatId), {
       messages: arrayUnion({
         senderId: currentUser.id,
-        text,
+        text: messageText,
+        encrypted: encryption,
         createdAt: new Date(),
         ...(imgUrl && { img: imgUrl }),
       }),
@@ -277,14 +302,14 @@ const toggleEncryption = async () => {
               {message.senderId === currentUser.id ? (
                 <SentMessage
                   msgImg={message.img}
-                  msgText={message.text}
+                  msgText={message.encrypted ? decryptMessage(message.text) : message.text}
                   msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   userImg={currentUser.avatar}
                 />
               ) : (
                 <ReceivedMessage
                   msgImg={message.img}
-                  msgText={message.text}
+                  msgText={message.encrypted ? decryptMessage(message.text) : message.text}
                   msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   userImg={user.avatar}
                 />
