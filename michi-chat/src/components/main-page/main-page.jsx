@@ -38,11 +38,14 @@ function mainPage() {
   const { currentUser } = useUserStore();
   const { changeChat, chatId } = useChatStore();
 
+  const [usersOnlineStatus, setUsersOnlineStatus] = useState({});
+
   // Fetch both personal and group chats
   useEffect(() => {
     const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res) => {
       const items = res.data().chats;
-
+  
+      // Mapear los chats para agregar la información de los usuarios
       const promises = items.map(async (item) => {
         if (item.isGroupChat) {
           return {
@@ -52,20 +55,38 @@ function mainPage() {
           };
         } else {
           const userDocRef = doc(db, "users", item.receiverId);
-          const userDocSnap = getDoc(userDocRef);
-          const user = (await userDocSnap).data();
+          const userDocSnap = await getDoc(userDocRef);
+          const user = userDocSnap.data();
           return { ...item, user };
         }
       });
-
+  
       const chatData = await Promise.all(promises);
       setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
     });
-
+  
+    // Escuchar los cambios de estado de conexión de los usuarios en tiempo real
+    const unSubStatus = onSnapshot(doc(db, 'users', currentUser.id), (docSnapshot) => {
+      const userData = docSnapshot.data();
+  
+      
+      setUsersOnlineStatus(prevState => {
+        const updatedStatus = { ...prevState };
+        chats.forEach(chat => {
+          if (!chat.isGroupChat && chat.user) {
+            updatedStatus[chat.user.id] = chat.user.isOnline;
+          }
+        });
+        updatedStatus[currentUser.id] = userData.isOnline; 
+        return updatedStatus;
+      });
+    });
+  
     return () => {
       unSub();
+      unSubStatus();
     };
-  }, [currentUser.id]);
+  }, [currentUser.id, chats]);  
 
   const handleSelect = async (chat) => {
     const chatIndex = chats.findIndex((item) => item.chatId === chat.chatId);
@@ -126,32 +147,37 @@ function mainPage() {
             />
           </div>
 
-          {/* Render chat list */}
-          {chats.map((chat) => (
-            <div onClick={() => handleSelect(chat)} key={chat.chatId}>
-              {chat.isGroupChat ? (
-                <ChatBox
-                  chatName={chat.groupName}
-                  lastMessage={chat.lastMessage}
-                  seen={chat.isSeen}
-                  time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  chatPicture={'/path-to-group-avatar.png'} // Default group avatar
-                />
-              ) : (
-                chat.user ? (
-                  <ChatBox
-                    chatName={chat.user.username}
-                    lastMessage={chat.lastMessage}
-                    seen={chat.isSeen}
-                    time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    chatPicture={chat.user.avatar}
-                  />
-                ) : (
-                  <div>No se pudo cargar la información del usuario</div>
-                )
-              )}
-            </div>
-          ))}
+          <div className="list">
+              {/* Render chat list */}
+              {chats.map((chat) => (
+                <div onClick={() => handleSelect(chat)} key={chat.chatId}>
+                  {chat.isGroupChat ? (
+                    <ChatBox
+                      chatName={chat.groupName}
+                      lastMessage={chat.lastMessage}
+                      seen={chat.isSeen}
+                      time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      chatPicture={'/path-to-group-avatar.png'} // Default group avatar
+                      
+                    />
+                  ) : (
+                    chat.user ? (
+                      <ChatBox
+                        chatName={chat.user.username}
+                        lastMessage={chat.lastMessage}
+                        seen={chat.isSeen}
+                        time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        chatPicture={chat.user.avatar}
+                        isOnline={chat.user.isOnline}
+                      />
+                    ) : (
+                      <div>No se pudo cargar la información del usuario</div>
+                    )
+                  )}
+                </div>
+              ))}
+          </div>
+          
         </div>
 
         <div className="chat_space">

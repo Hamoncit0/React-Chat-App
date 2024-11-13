@@ -2,7 +2,7 @@ import React from 'react';
 import './chatBox.css';
 import { Box, Typography, Avatar } from '@mui/material';
 
-function chatBox({ chatName, chatPicture, lastMessage, time, seen=false }) {
+function chatBox({ chatName, chatPicture, lastMessage, time, seen=false, isOnline }) {
   return (
     <div>
       <Box
@@ -38,6 +38,7 @@ function chatBox({ chatName, chatPicture, lastMessage, time, seen=false }) {
           </Typography>
           <span style={{ marginLeft: '10px' }}>{time}</span>
           {!seen == true ? (<div className="circle"></div>): (<div></div>)}
+          <div className={`status-circle ${isOnline ? 'online' : 'offline'}`}></div>
         </div>
       </Box>
     </div>

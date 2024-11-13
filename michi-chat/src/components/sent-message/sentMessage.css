@@ -27,3 +27,6 @@
     margin: 10px;
     max-width: 50%;
 }
+.msg_content_sender img{
+    width: 100%;
+}
