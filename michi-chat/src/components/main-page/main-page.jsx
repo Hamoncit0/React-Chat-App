@@ -37,6 +37,34 @@ function MainPage() {
   const [searchTerm, setSearchTerm] = useState(''); 
   const [usersOnlineStatus, setUsersOnlineStatus] = useState({});
 
+  ///////////////////////LLAMADASSSS///////////////////////////
+  useEffect(() => {
+    // Envía el userId al servidor al conectarse
+    socket.emit('register-user', currentUser.id);
+
+    socket.on('incoming-call', async({ callerId, roomId }) => {
+      // Obtén el nombre del usuario desde Firebase
+      const userDoc = await getDoc(doc(db, "users", callerId));
+      const callerName = userDoc.exists() ? userDoc.data().username : 'Unknown Caller';
+      
+      setIncomingCall({ callerId, roomId, callerName });
+    });
+
+    return () => {
+      socket.off('incoming-call');
+    };
+}, [currentUser.id]);
+
+
+  const acceptCall = () => {
+    if (incomingCall) {
+      navigate(`/call/${incomingCall.roomId}/${incomingCall.callerName}/${currentUser.username}`);
+      setIncomingCall(null);
+    }
+  };
+////////////////SE TERMINAN LLAMADAS//////////////////
+
+//////////////////////FUNCIONES DE LISTA DE CHAT//////////////////////////////////////////
 
 // Función para manejar el cambio en el campo de búsqueda
 const handleSearchChange = (event) => {
@@ -57,37 +85,75 @@ const handleSearchChange = (event) => {
   }
 };
 
+
 useEffect(() => {
     // Cuando se actualicen los chats, también se actualizan los chats filtrados
     setFilteredChats(chats);
-  }, [chats]);
+}, [chats]);
+const handleSelect = async (chat) => {
+  const chatIndex = chats.findIndex((item) => item.chatId === chat.chatId);
+  chats[chatIndex].isSeen = true;
 
-  useEffect(() => {
-    // Envía el userId al servidor al conectarse
-    socket.emit('register-user', currentUser.id);
+  const userChatsRef = doc(db, "userchats", currentUser.id);
 
-    socket.on('incoming-call', async({ callerId, roomId }) => {
-      // Obtén el nombre del usuario desde Firebase
-      const userDoc = await getDoc(doc(db, "users", callerId));
-      const callerName = userDoc.exists() ? userDoc.data().username : 'Unknown Caller';
-      
-      setIncomingCall({ callerId, roomId, callerName });
+  try {
+    await updateDoc(userChatsRef, {
+      chats: chats,
     });
 
-    return () => {
-      socket.off('incoming-call');
-    };
-  }, [currentUser.id]);
-
-
-  const acceptCall = () => {
-    if (incomingCall) {
-      navigate(`/call/${incomingCall.roomId}/${incomingCall.callerName}/${currentUser.username}`);
-      setIncomingCall(null);
+    if (chat.isGroupChat) {
+      changeChat(chat.chatId, { groupName: chat.groupName, members: chat.groupMembers, blocked: [] });
+    } else {
+      changeChat(chat.chatId, chat.user);
     }
-  };
+  } catch (err) {
+    console.log(err);
+  }
+};
+ // Suscripción a los cambios en `chats` y actualización del estado de conexión en tiempo real
+ useEffect(() => {
+  const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res) => {
+    const items = res.data().chats;
+
+    // Procesar cada chat para obtener información del usuario o grupo
+    const promises = items.map(async (item) => {
+      if (item.isGroupChat) {
+        const groupChatDoc = await getDoc(doc(db, 'chats', item.chatId));
+        const groupChatData = groupChatDoc.data();
+        return {
+          ...item,
+          groupName: groupChatData.groupName || 'Chat grupal',
+          groupImage: groupChatData.groupImage || '',
+        };
+      } else {
+        const userDocRef = doc(db, "users", item.receiverId);
+        const userDocSnap = await getDoc(userDocRef);
+        const user = userDocSnap.data();
+        // Escuchar cambios en el estado de conexión del usuario
+        if (!usersOnlineStatus.hasOwnProperty(item.receiverId)) {
+          listenUserOnlineStatus(item.receiverId);
+        }
+        return {
+          ...item,
+          user: {
+            ...user,
+            activeHat: user?.activeHat || null,
+          },
+        };
+      }
+    });
+
+    const chatData = await Promise.all(promises);
+    setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+  });
+
+  return () => unSub();
+}, [currentUser.id, usersOnlineStatus]);
 
 
+//////////////////////////////SE TERMINAN FUNCIONES DE LISTA DE CHATS////////////////////////////
+
+/////////////////////////////MODALES PARA CREAR NUEVOS CHATS//////////////////////////
   const toggleModal = () => {
     setModal(!modal);
     handleClose();
@@ -98,92 +164,65 @@ useEffect(() => {
     handleClose();
   };
 
-  useEffect(() => {
-    const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res) => {
-      const items = res.data().chats;
-  
-      // Mapear los chats para agregar la información de los usuarios
-      const promises = items.map(async (item) => {
-        if (item.isGroupChat) {
-          // Recuperar el documento del chat grupal desde Firebase
-          const groupChatDoc = await getDoc(doc(db, 'chats', item.chatId));
-          const groupChatData = groupChatDoc.data();
-          
-          return {
-            ...item,
-            groupName: groupChatData.groupName || 'Chat grupal', // Usar el nombre del grupo o un valor por defecto
-            groupMembers: groupChatData.members || [],
-            groupImage: groupChatData.groupImage || ''
-          };
-        } else {
-          const userDocRef = doc(db, "users", item.receiverId);
-          const userDocSnap = getDoc(userDocRef);
-          const user = (await userDocSnap).data();
-          
-          return {
-            ...item,
-            user: {
-              ...user,
-              activeHat: user?.activeHat || null,
-            },
-          };
-        }
-      });
-  
-      const chatData = await Promise.all(promises);
-      setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
-    });
-  
-    // Escuchar los cambios de estado de conexión de los usuarios en tiempo real
-    const unSubStatus = onSnapshot(doc(db, 'users', currentUser.id), (docSnapshot) => {
-      const userData = docSnapshot.data();
-  
-      
-      setUsersOnlineStatus(prevState => {
-        const updatedStatus = { ...prevState };
-        chats.forEach(chat => {
-          if (!chat.isGroupChat && chat.user) {
-            updatedStatus[chat.user.id] = chat.user.isOnline;
-          }
-        });
-        updatedStatus[currentUser.id] = userData.isOnline; 
-        return updatedStatus;
-      });
-    });
-  
-    return () => {
-      unSub();
-      unSubStatus();
-    };
-  }, [currentUser.id, chats]);  
-
-  const handleSelect = async (chat) => {
-    const chatIndex = chats.findIndex((item) => item.chatId === chat.chatId);
-    chats[chatIndex].isSeen = true;
-
-    const userChatsRef = doc(db, "userchats", currentUser.id);
-
-    try {
-      await updateDoc(userChatsRef, {
-        chats: chats,
-      });
-
-      if (chat.isGroupChat) {
-        changeChat(chat.chatId, { groupName: chat.groupName, members: chat.groupMembers, blocked: [] });
-      } else {
-        changeChat(chat.chatId, chat.user);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  ////////////////////////////SE TERMINAN FUNCIONES PARA MODALES DE CREAR CHATS/////////////////////
+/////////////////////////////////STATUSSS////////////////////////////////////////////
+const listenUserOnlineStatus = (userId) => {
+  return onSnapshot(doc(db, 'users', userId), (docSnapshot) => {
+    const userData = docSnapshot.data();
+
+    if (userData && userData.isOnline !== usersOnlineStatus[userId]) {
+      setUsersOnlineStatus((prevState) => ({
+        ...prevState,
+        [userId]: userData.isOnline,
+      }));
+    }
+  });
+};
+// Función para escuchar cambios de conexión del usuario actual
+useEffect(() => {
+  // Escucha los cambios en el documento del usuario
+  const unSubStatus = onSnapshot(doc(db, 'users', currentUser.id), (docSnapshot) => {
+    const userData = docSnapshot.data();
+
+    // Solo actualiza si `isOnline` cambió
+    if (userData && userData.isOnline !== usersOnlineStatus[currentUser.id]) {
+      setUsersOnlineStatus((prevState) => ({
+        ...prevState,
+        [currentUser.id]: userData.isOnline,
+      }));
+    }
+  });
+
+  return () => {
+    unSubStatus(); // Detener la escucha al desmontar el componente
+  };
+}, [currentUser.id, usersOnlineStatus]);
+
+useEffect(() => {
+  // Establecer estado en línea al abrir la pestaña
+  const userRef = doc(db, 'users', currentUser.id);
+  updateDoc(userRef, { isOnline: true });
+
+  // Cambiar a offline al cerrar la pestaña
+  const handleTabClose = async () => {
+    await updateDoc(userRef, { isOnline: false });
+  };
+  window.addEventListener('beforeunload', handleTabClose);
+
+  // Limpieza del evento al desmontar el componente
+  return () => {
+    window.removeEventListener('beforeunload', handleTabClose);
+    updateDoc(userRef, { isOnline: false });
+  };
+}, [currentUser.id]);
+
 
   return (
     <div className='mainpage'>
@@ -233,6 +272,7 @@ useEffect(() => {
                     seen={chat.isSeen}
                     time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     chatPicture={chat.groupImage || '/path-to-group-avatar.png'}
+                    groupchat={true}
                   />
                 ) : (
                   chat.user ? (

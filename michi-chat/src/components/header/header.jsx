@@ -11,22 +11,6 @@ import { auth } from '../../lib/firebase';
 import { db } from '../../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore'; // Import Firestore
 
-export const setUserOnlineStatus = async (userId, isOnlineStatus) => {
-  if (!userId) {
-    console.error("El ID de usuario no está definido");
-    return;
-  }
-
-  const userRef = doc(db, "users", userId);
-  try {
-    await updateDoc(userRef, {
-      isOnline: isOnlineStatus
-    });
-    console.log(`Estado online actualizado a ${isOnlineStatus} para el usuario con ID: ${userId}`);
-  } catch (error) {
-    console.error("Error al actualizar el estado online:", error);
-  }
-};
 
 function Header() {
   const navigate = useNavigate(); // Inicializa useNavigate para redirigir
@@ -34,6 +18,24 @@ function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const { currentUser } = useUserStore();
+  const [status, setStatus] = useState(false)
+
+  const setUserOnlineStatus = async (userId, isOnlineStatus) => {
+    if (!userId) {
+      console.error("El ID de usuario no está definido");
+      return;
+    }
+  
+    const userRef = doc(db, "users", userId);
+    try {
+      await updateDoc(userRef, {
+        isOnline: isOnlineStatus
+      });
+      console.log(`Estado online actualizado a ${isOnlineStatus} para el usuario con ID: ${userId}`);
+    } catch (error) {
+      console.error("Error al actualizar el estado online:", error);
+    }
+  };
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('isDarkMode');
@@ -48,6 +50,12 @@ function Header() {
     setIsDarkMode(newTheme);
     localStorage.setItem('isDarkMode', newTheme);
   };
+
+  const toggleStatus = ()=>{
+    setStatus(!status)
+    setUserOnlineStatus(currentUser.id, status)
+    console.log('status el user: ' + status)
+  }
 
   useEffect(() => {
     if (isDarkMode) {
@@ -85,7 +93,7 @@ function Header() {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}>
         <img src={currentUser?.avatar || 'src/assets/pictures/avatar-blank.png'} alt="" />
-        <div className="status_circle"></div>
+        <div className={`${!status ? 'status-circle-online' : 'status-circle-offline'}`}></div>
       </div>
 
       <Menu
@@ -106,6 +114,14 @@ function Header() {
             color="var(--color-primary)"
             checked={isDarkMode}
             onChange={toggleTheme}
+          />
+        </MenuItem>
+        <MenuItem>
+          Cambiar a {status ? 'Conectado' : 'Desconectado'}
+          <Switch
+            color="green"
+            checked={!status}
+            onChange={toggleStatus}
           />
         </MenuItem>
         <MenuItem onClick={async () => {

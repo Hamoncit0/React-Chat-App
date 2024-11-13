@@ -17,7 +17,7 @@ function NewGroupChat({ isOpen, closeModal }) {
   const [groupImage, setGroupImage] = useState('');
   const [step, setStep] = useState(1); // Paso 1: Nombre y foto del grupo, Paso 2: Selección de usuarios
   const { currentUser } = useUserStore();
-  const [img, setImg] = useState({ file: null, url: "" });
+  const [groupImg, setGroupImg] = useState({ file: null, url: "" });
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -36,9 +36,9 @@ function NewGroupChat({ isOpen, closeModal }) {
     }
   };
 
-  const handleImg = (e) => {
+  const handleImgGroup = (e) => {
     if (e.target.files[0]) {
-      setImg({
+      setGroupImg({
         file: e.target.files[0],
         url: URL.createObjectURL(e.target.files[0]),
       });
@@ -56,8 +56,8 @@ function NewGroupChat({ isOpen, closeModal }) {
 
         let imgUrl = null;
 
-        if (img.file) {
-          imgUrl = await upload(img.file);
+        if (groupImg.file) {
+          imgUrl = await upload(groupImg.file);
         }
 
         const chatRef = collection(db, 'chats');
@@ -96,7 +96,7 @@ function NewGroupChat({ isOpen, closeModal }) {
       } catch (err) {
         console.error('Error al crear el grupo de chat:', err);
       }finally{
-        setImg({
+        setGroupImg({
           file: null,
           url: "",
          });
@@ -129,17 +129,17 @@ function NewGroupChat({ isOpen, closeModal }) {
           <input
           className='uploadImgGroup'
             type='file'
-            name="file-upload" 
-            id="file-upload" 
-            onChange={handleImg}
+            name="group-photo" 
+            id="group-photo" 
+            onChange={handleImgGroup}
             placeholder="URL de la imagen del grupo"
             value={groupImage}
           />
-          <label className='btn selectImgGroup' htmlFor="file-upload">Upload Group Image</label>
-          {img.url && (
-          <div className="img-previewGroup">
+          <label className='btn selectImgGroup' htmlFor="group-photo">Upload Group Image</label>
+          {groupImg.url && (
+          <div className="groupImg-previewGroup">
             <p>Img preview:</p>
-            <img src={img.url} alt="" />
+            <img src={groupImg.url} alt="" />
           </div>
         )}
           <button

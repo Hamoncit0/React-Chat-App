@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import InfoIcon from '@mui/icons-material/Info';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import SendIcon from '@mui/icons-material/Send';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import Switch from '@mui/material/Switch';
@@ -364,7 +365,7 @@ const toggleEncryption = async () => {
         )}
         
       {location && (
-        <div className='location-preview'>
+        <div className='img-preview'>
           <p>Ubicación activada: {location.latitude}, {location.longitude}</p>
         </div>
       )}
@@ -374,7 +375,7 @@ const toggleEncryption = async () => {
             <input type="file" name="file-upload" id="file-upload" onChange={handleImg} />
             <label htmlFor="file-upload"><AttachFileIcon /></label>
             <button onClick={toggleTaskBar}><AddTaskIcon /></button>
-            <button onClick={getLocation}>Location</button>
+            <button onClick={getLocation}><AddLocationAltIcon/></button>
           </div>
           <input type="text" placeholder='Escribe Aqui'
             value={text}

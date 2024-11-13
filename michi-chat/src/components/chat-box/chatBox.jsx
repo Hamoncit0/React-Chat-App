@@ -9,7 +9,7 @@ import cuernos from '../../assets/sombreritos/cuernos.png';
 import michiorejas from '../../assets/sombreritos/michiorejas.png';
 import chefhat from '../../assets/sombreritos/chefhat.png';
 
-function chatBox({ chatName, chatPicture, lastMessage, time, seen=false, activeHat, isOnline }) {
+function chatBox({ chatName, chatPicture, lastMessage, time, seen=false, activeHat, isOnline, groupchat }) {
   const hats = [
     { id: 'patito', name: 'Patito', price: 10, image: patito },
     { id: 'santahat', name: 'Santa', price: 10, image: santahat },
@@ -38,6 +38,9 @@ function chatBox({ chatName, chatPicture, lastMessage, time, seen=false, activeH
             <img src={activeHatImage} alt="Active Hat" className='activeHat' />
           )}
           <Avatar sx={{ height: '60px', width: '60px' }} src={chatPicture} alt="Logo" />
+          { !groupchat &&
+          <div className={`status-circle ${isOnline ? 'online' : 'offline'}`}></div>
+          }
           <Typography variant="h5" sx={{ marginLeft: '20px' }}>
             {chatName || "uwu"}
           </Typography>
@@ -58,7 +61,6 @@ function chatBox({ chatName, chatPicture, lastMessage, time, seen=false, activeH
           </Typography>
           <span style={{ marginLeft: '10px' }}>{time}</span>
           {!seen == true ? (<div className="circle"></div>): (<div></div>)}
-          <div className={`status-circle ${isOnline ? 'online' : 'offline'}`}></div>
         </div>
       </Box>
     </div>

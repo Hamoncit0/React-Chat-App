@@ -63,11 +63,21 @@ li:hover, li:active {
     border-radius: 50%;
 }
 
-.status_circle {
+.status-circle-online {
   width: 2vh;
   height: 2vh;
   border-radius: 50%;
-  background-color: rgb(72, 255, 72);
+  background-color: #00ff00;
+  border: 2px solid white;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+}
+.status-circle-offline {
+  width: 2vh;
+  height: 2vh;
+  border-radius: 50%;
+  background-color: #ff0000;
   border: 2px solid white;
   bottom: 0;
   right: 0;
