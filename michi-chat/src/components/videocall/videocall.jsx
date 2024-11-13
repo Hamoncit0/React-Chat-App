@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-const socket = io('http://localhost:5000'); // Conectar al servidor backend
+const socket = io('https://socket-io-call.onrender.com'); // Conectar al servidor backend
 import './videocall.css'
 
 const VideoCall = () => {

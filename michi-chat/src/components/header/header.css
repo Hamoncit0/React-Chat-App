@@ -52,6 +52,7 @@ li:hover, li:active {
     border-radius: 50%;
     margin: 10px;
     margin-right: 5%;
+    margin-top: 2rem;
     position: relative;
 }
 .profile_picture:hover{
@@ -106,4 +107,12 @@ li:hover, li:active {
 
 .dropdown-menu .MuiMenuItem-root:first-child {
     border-top: none;  /* No poner borde en el primer elemento */
+  }
+  .activeHatCurrentUser {
+      z-index: 1000;
+      height: 40px;
+      width: 40px;
+      top: -2rem;
+      left: 0px;
+      position: absolute;
   }

@@ -20,7 +20,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io('https://socket-io-call.onrender.com');
 
 function MainPage() {
   const [modal, setModal] = useState(false);

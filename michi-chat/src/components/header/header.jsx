@@ -9,8 +9,13 @@ import Switch from '@mui/material/Switch';
 import { useUserStore } from '../../lib/userStore'
 import { auth } from '../../lib/firebase';
 import { db } from '../../lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore'; // Import Firestore
+import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 
+import patito from '../../assets/sombreritos/patito.png';
+import santahat from '../../assets/sombreritos/santahat.png';
+import cuernos from '../../assets/sombreritos/cuernos.png';
+import michiorejas from '../../assets/sombreritos/michiorejas.png';
+import chefhat from '../../assets/sombreritos/chefhat.png';
 
 function Header() {
   const navigate = useNavigate(); // Inicializa useNavigate para redirigir
@@ -19,6 +24,33 @@ function Header() {
   const open = Boolean(anchorEl);
   const { currentUser } = useUserStore();
   const [status, setStatus] = useState(false)
+  const [activeHatImage, setActiveHatImage] = useState(null);
+
+  const hats = [
+    { id: 'patito', name: 'Patito', price: 10, image: patito },
+    { id: 'santahat', name: 'Santa', price: 10, image: santahat },
+    { id: 'cuernos', name: 'Bisonte', price: 10, image: cuernos },
+    { id: 'michiorejas', name: 'Egirl', price: 10, image: michiorejas },
+    { id: 'chefhat', name: 'Let him cook', price: 10, image: chefhat }
+  ];
+
+
+  // Escucha los cambios en tiempo real del campo `activeCosmetic` del usuario actual
+  useEffect(() => {
+    if (!currentUser?.id) return;
+
+    const userRef = doc(db, 'users', currentUser.id);
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.data();
+        const hat = hats.find(h => h.id === userData.activeCosmetic);
+        setActiveHatImage(hat ? hat.image : null);
+      }
+    });
+
+    // Limpia la suscripción cuando el componente se desmonta o el usuario cambia
+    return () => unsubscribe();
+  }, [currentUser?.id]);
 
   const setUserOnlineStatus = async (userId, isOnlineStatus) => {
     if (!userId) {
@@ -92,6 +124,7 @@ function Header() {
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}>
+          { currentUser?.activeCosmetic && <img src={activeHatImage} alt="Active Hat" className='activeHatCurrentUser' />}
         <img src={currentUser?.avatar || 'src/assets/pictures/avatar-blank.png'} alt="" />
         <div className={`${!status ? 'status-circle-online' : 'status-circle-offline'}`}></div>
       </div>

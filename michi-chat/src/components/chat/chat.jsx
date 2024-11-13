@@ -22,7 +22,7 @@ import CryptoJS from 'crypto-js'
 
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io('https://socket-io-call.onrender.com');
 
 function Chat() {
   const navigate = useNavigate();
