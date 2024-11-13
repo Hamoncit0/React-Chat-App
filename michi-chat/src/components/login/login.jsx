@@ -5,6 +5,8 @@ import Signup from '../signup/signup';
 import { toast } from 'react-toastify';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase';  // Asegúrate de que Firebase esté configurado
 
 function Login() {
   const [modal, setModal] = useState(false);
@@ -19,6 +21,20 @@ function Login() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+
+  
+
+  const setUserOnlineStatus = async (userId, isOnlineStatus) => {
+    const userRef = doc(db, "users", userId);
+    try {
+      await updateDoc(userRef, {
+        isOnline: isOnlineStatus // Actualizamos el campo isOnline
+      });
+    } catch (error) {
+      console.error("Error actualizando el estado online:", error);
+    }
+  };
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,8 +57,11 @@ function Login() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       toast.success('Se pudo ingresar exitosamente!');
+      // Actualizamos el estado online del usuario en Firestore
+      const userId = userCredential.user.uid; // Obtener el UID del usuario
+      setUserOnlineStatus(userId, true); // Establecer a "en línea"
     } catch (err) {
       console.error(err);
       toast.error('No se pudo ingresar :(');

@@ -1,18 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import './header.css'
 import logo from '../../assets/logo_medium.png'
-import pictuere from '../../assets/pictures/magicbara.png'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-
 import Switch from '@mui/material/Switch';
 import { useUserStore } from '../../lib/userStore'
 import { auth } from '../../lib/firebase';
-function header() {
-  ////////////////////////MODO OSCURO//////////////////////
+import { db } from '../../lib/firebase';
+import { doc, updateDoc } from 'firebase/firestore'; // Import Firestore
+
+export const setUserOnlineStatus = async (userId, isOnlineStatus) => {
+  if (!userId) {
+    console.error("El ID de usuario no está definido");
+    return;
+  }
+
+  const userRef = doc(db, "users", userId);
+  try {
+    await updateDoc(userRef, {
+      isOnline: isOnlineStatus
+    });
+    console.log(`Estado online actualizado a ${isOnlineStatus} para el usuario con ID: ${userId}`);
+  } catch (error) {
+    console.error("Error al actualizar el estado online:", error);
+  }
+};
+
+function Header() {
+  const navigate = useNavigate(); // Inicializa useNavigate para redirigir
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const { currentUser } = useUserStore();
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('isDarkMode');
     if (savedTheme === 'true') {
@@ -21,14 +43,12 @@ function header() {
     }
   }, []);
 
-  // Cambia el tema y guarda la preferencia en localStorage
   const toggleTheme = () => {
     const newTheme = !isDarkMode;
     setIsDarkMode(newTheme);
     localStorage.setItem('isDarkMode', newTheme);
   };
 
-  // Efecto para agregar o remover la clase 'dark-mode' al body
   useEffect(() => {
     if (isDarkMode) {
       document.body.classList.add('darktheme');
@@ -37,50 +57,38 @@ function header() {
     }
   }, [isDarkMode]);
 
-  // Controlar el cambio del Switch de tema oscuro
-  const handleThemeSwitchChange = (event) => {
-    toggleTheme();  // Cambiar el tema cuando se use el Switch
-  };
-
-  ////////////////////////////////DROPDOWN MENU//////////////////////////
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
-/////////////////INFO USU/////////////////////////////
-const { currentUser } = useUserStore();
-
 
   return (
     <div className="header">
-        <img className='header_logo' src={logo} alt="michi chat logo" />
-        <div className='opciones'>
-          <ul className='nav'>
-            
-            <Link className='linkD' to="/main">
-              <li> Chats</li>
-            </Link>
-            <Link className='linkD' to="/tiendita">
-              <li >Tiendita</li>
-            </Link>
-          </ul>
-        </div>
-        <div className='profile_picture'
+      <img className='header_logo' src={logo} alt="michi chat logo" />
+      <div className='opciones'>
+        <ul className='nav'>
+          <Link className='linkD' to="/main">
+            <li> Chats</li>
+          </Link>
+          <Link className='linkD' to="/tiendita">
+            <li>Tiendita</li>
+          </Link>
+        </ul>
+      </div>
+      <div className='profile_picture'
         id="basic-button"
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}>
-          <img  src={currentUser.avatar || 'src\assets\pictures\avatar-blank.png'} alt="" />
-          <div className="status_circle">
-          </div>
-        </div>
+        <img src={currentUser?.avatar || 'src/assets/pictures/avatar-blank.png'} alt="" />
+        <div className="status_circle"></div>
+      </div>
 
-        <Menu
+      <Menu
         className='dropdown-menu'
         id="basic-menu"
         anchorEl={anchorEl}
@@ -92,21 +100,28 @@ const { currentUser } = useUserStore();
       >
         <MenuItem>Profile</MenuItem>
         <MenuItem>My account</MenuItem>
-        <MenuItem>Cambiar a {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-        <Switch
+        <MenuItem>
+          Cambiar a {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+          <Switch
             color="var(--color-primary)"
-            checked={isDarkMode} // Vincula el estado del switch con el tema oscuro
-            onChange={handleThemeSwitchChange} // Maneja el cambio del switch
-          /></MenuItem>
-        <MenuItem onClick={()=>auth.signOut()}>Logout</MenuItem>
+            checked={isDarkMode}
+            onChange={toggleTheme}
+          />
+        </MenuItem>
+        <MenuItem onClick={async () => {
+          try {
+            await auth.signOut();  // Cerrar sesión de Firebase
+            if (currentUser?.id) {
+              await setUserOnlineStatus(currentUser.id, false);  // Marcar al usuario como offline
+            }
+            navigate('/login');  // Redirigir al login
+          } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+          }
+        }}>Logout</MenuItem>
       </Menu>
-  
-
-
-
     </div>
-    
-  )
+  );
 }
 
-export default header
+export default Header;

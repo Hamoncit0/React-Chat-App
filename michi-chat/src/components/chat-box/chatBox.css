@@ -27,3 +27,17 @@
     left: 10px;
     position: absolute;
 }
+.status-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 10px;
+  }
+  
+  .online {
+    background-color: green; /* Círculo verde para usuarios en línea */
+  }
+  
+  .offline {
+    background-color: black; /* Círculo negro para usuarios desconectados */
+  }

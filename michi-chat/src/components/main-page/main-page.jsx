@@ -35,6 +35,7 @@ function MainPage() {
   const navigate = useNavigate();
   const [filteredChats, setFilteredChats] = useState([]); // Estado para los chats filtrados
   const [searchTerm, setSearchTerm] = useState(''); 
+  const [usersOnlineStatus, setUsersOnlineStatus] = useState({});
 
 
 // Función para manejar el cambio en el campo de búsqueda
@@ -101,6 +102,7 @@ useEffect(() => {
     const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res) => {
       const items = res.data().chats;
   
+      // Mapear los chats para agregar la información de los usuarios
       const promises = items.map(async (item) => {
         if (item.isGroupChat) {
           // Recuperar el documento del chat grupal desde Firebase
@@ -132,11 +134,28 @@ useEffect(() => {
       setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
     });
   
+    // Escuchar los cambios de estado de conexión de los usuarios en tiempo real
+    const unSubStatus = onSnapshot(doc(db, 'users', currentUser.id), (docSnapshot) => {
+      const userData = docSnapshot.data();
+  
+      
+      setUsersOnlineStatus(prevState => {
+        const updatedStatus = { ...prevState };
+        chats.forEach(chat => {
+          if (!chat.isGroupChat && chat.user) {
+            updatedStatus[chat.user.id] = chat.user.isOnline;
+          }
+        });
+        updatedStatus[currentUser.id] = userData.isOnline; 
+        return updatedStatus;
+      });
+    });
+  
     return () => {
       unSub();
+      unSubStatus();
     };
-  }, [currentUser.id]);
-  
+  }, [currentUser.id, chats]);  
 
   const handleSelect = async (chat) => {
     const chatIndex = chats.findIndex((item) => item.chatId === chat.chatId);
@@ -224,6 +243,7 @@ useEffect(() => {
                       time={new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       chatPicture={chat.user.avatar}
                       activeHat={chat.user.activeCosmetic}
+                      isOnline={chat.user.isOnline}
                     />
                   ) : (
                     <div>No se pudo cargar la información del usuario</div>

@@ -28,6 +28,7 @@ function Chat() {
   const [task, setTask] = useState("");//el texto del input para mandar tasks
   const [tasks, setTasks] = useState([]); //el array de tasks
   const [text, setText] = useState("");
+  const [location, setLocation] = useState(null);
   const [chat, setChat] = useState();
   const scrollRef = useRef(null);
   const { chatId, user } = useChatStore();
@@ -141,6 +142,25 @@ function Chat() {
       });
     }
   };
+
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('Ubicación obtenida:', latitude, longitude); // Verifica que las coordenadas sean correctas
+          setLocation({ latitude, longitude });
+        },
+        (error) => {
+          console.error('Error al obtener la ubicación:', error); // Mostrar detalles del error
+          alert('No se pudo obtener la ubicación. Verifica tus permisos o intenta nuevamente.');
+        }
+      );
+    } else {
+      alert('La geolocalización no es compatible con este navegador.');
+    }
+  };
+
  // Cargar puntos iniciales desde Firebase
  useEffect(() => {
     const loadPoints = async () => {
@@ -170,7 +190,8 @@ function Chat() {
   }, [chatId]);
 
 const handleSend = async () => {
-  if (text === "" && img.url === "") return;
+  if (text === '' && img.url === '' && !location) return;
+
 
   let imgUrl = null;
   let messageText = encryption ? encryptMessage(text) : text;
@@ -187,6 +208,7 @@ const handleSend = async () => {
         encrypted: encryption,
         createdAt: new Date(),
         ...(imgUrl && { img: imgUrl }),
+        ...(location && { location }),
       }),
     });
 
@@ -235,7 +257,7 @@ const handleSend = async () => {
     file: null,
     url: "",
   });
-
+  setLocation(null);
   setText("");
   }
 };
@@ -320,6 +342,7 @@ const toggleEncryption = async () => {
                   msgText={message.encrypted ? decryptMessage(message.text) : message.text}
                   msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   userImg={currentUser.avatar}
+                  msgLocation={message.location}
                 />
               ) : (
                 <ReceivedMessage
@@ -327,6 +350,7 @@ const toggleEncryption = async () => {
                   msgText={message.encrypted ? decryptMessage(message.text) : message.text}
                   msgTime={new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   userImg={userProfiles[message.senderId]?.avatar}
+                  msgLocation={message.location}
                 />
               )}
             </div>
@@ -338,11 +362,19 @@ const toggleEncryption = async () => {
             <img src={img.url} alt="" />
           </div>
         )}
+        
+      {location && (
+        <div className='location-preview'>
+          <p>Ubicación activada: {location.latitude}, {location.longitude}</p>
+        </div>
+      )}
+
         <div className="chat_bar">
           <div className="chat_options">
             <input type="file" name="file-upload" id="file-upload" onChange={handleImg} />
             <label htmlFor="file-upload"><AttachFileIcon /></label>
             <button onClick={toggleTaskBar}><AddTaskIcon /></button>
+            <button onClick={getLocation}>Location</button>
           </div>
           <input type="text" placeholder='Escribe Aqui'
             value={text}

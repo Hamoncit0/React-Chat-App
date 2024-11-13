@@ -9,7 +9,7 @@ import cuernos from '../../assets/sombreritos/cuernos.png';
 import michiorejas from '../../assets/sombreritos/michiorejas.png';
 import chefhat from '../../assets/sombreritos/chefhat.png';
 
-function chatBox({ chatName, chatPicture, lastMessage, time, seen=false, activeHat }) {
+function chatBox({ chatName, chatPicture, lastMessage, time, seen=false, activeHat, isOnline }) {
   const hats = [
     { id: 'patito', name: 'Patito', price: 10, image: patito },
     { id: 'santahat', name: 'Santa', price: 10, image: santahat },
@@ -58,6 +58,7 @@ function chatBox({ chatName, chatPicture, lastMessage, time, seen=false, activeH
           </Typography>
           <span style={{ marginLeft: '10px' }}>{time}</span>
           {!seen == true ? (<div className="circle"></div>): (<div></div>)}
+          <div className={`status-circle ${isOnline ? 'online' : 'offline'}`}></div>
         </div>
       </Box>
     </div>
