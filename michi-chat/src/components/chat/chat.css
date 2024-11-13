@@ -163,13 +163,44 @@
 }
   
 .settings{
+    display: flex;
+    flex-direction: column;
     h1{
         background-color: var(--color-primary);
         padding: 10px;
     }
+    h2{
+        background-color: var(--color-primary);
+        padding: 10px;
+    }
     >span{
+        padding: 10px;
         display: flex;
         align-items: center;
         border-bottom: var(--color-primary) dashed 4px;
+    }
+}
+
+.miembros{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: scroll;
+    height: 60%;
+    .miembro{
+        display: flex;
+        align-items: center;
+        border-bottom: dashed var(--color-primary) 4px;
+        padding: 20px;
+        img{    
+            height: 3rem;
+            width: 3rem;
+            border: none;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    }
+    :first-child{
+        border-top: dashed var(--color-primary) 4px;
     }
 }

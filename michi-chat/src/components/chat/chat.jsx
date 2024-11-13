@@ -110,6 +110,13 @@ function Chat() {
       res.data().messages.forEach((message) => {
         fetchUserProfile(message.senderId);
       });
+      // Obtener perfiles de todos los miembros en el caso de un chat de grupo
+      if (res.data().isGroupChat) {
+        res.data().members.forEach((memberId) => {
+          fetchUserProfile(memberId);
+        });
+    }
+
 
       setEncryption(res.data()?.encryption || false);
     });
@@ -353,6 +360,19 @@ const toggleEncryption = async () => {
               onChange={toggleEncryption} // Maneja el cambio del switch
               />
             </span>
+            { chat?.members &&
+            <div className="member-container">
+              <h2>Miembros del grupo</h2>
+              <div className="miembros">
+                  {chat?.members?.map((memberId) => (
+                    <div className="miembro" key={memberId}>
+                      <img src={userProfiles[memberId]?.avatar} alt="avatar" />
+                      <p>{userProfiles[memberId]?.username || "Nombre desconocido"}</p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+            }
           </div>
         </div>}
      { openTask &&  <div className="tasks-container">
